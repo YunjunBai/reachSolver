@@ -1,0 +1,57 @@
+#预备
+sudo apt install build-essential libssl-dev curl cmake git uuid-dev python-dev libboost-all-dev libeigen3-dev libglpk-dev doxygen graphviz libgraphviz-dev libgtest-dev  libqhull-dev  libflann-dev libantlr-dev libantlr4-runtime-java libomp-dev libgl1-mesa-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libfmt-dev python-numpy libpari-gmp-tls6 liblog4cxx-dev
+
+#安装 filib++
+wget -O filibsrc.tar.gz http://www2.math.uni-wuppertal.de/wrswt/software/filib++/filibsrc-3.0.2.tar.gz
+tar -zxf filibsrc.tar.gz filibsrc/
+cd filibsrc/ && ./configure && make
+sudo make install  && cd ~
+
+#安装libigl
+git clone --recursive https://github.com/libigl/libigl.git
+
+#安装capd
+wget -O capd.tar.gz https://sourceforge.net/projects/capd/files/5.1.2/bin/capd-5.1.13-dev-ubuntu_x86-x86_64.tar.gz
+tar -zxf capd.tar.gz capd-5.1.13-dev-ubuntu_x86-x86_64/
+sudo cp -r capd-5.1.13-dev-ubuntu_x86-x86_64/usr/local/* /usr/local/
+cd /usr/local/lib && sudo rm libcapdapiRedHom_py3.so.4 libcapdapiRedHom_py2.so.4 libcapdRedHom.so.4 libmpcapd-gui.so.4 libcapd-gui.so.4 libmpcapd.so.4  libcapd.so.4 && cd ~
+
+#安装antlr-4.7.2
+cd /usr/local/lib
+sudo curl -O https://www.antlr.org/download/antlr-4.7.2-complete.jar
+cd ~
+mkdir antlr-src && cd antlr-src
+wget http://www.antlr.org/download/antlr4-cpp-runtime-4.7.2-source.zip
+unzip antlr4-cpp-runtime-4.7.2-source.zip
+mkdir build && cd build
+cmake .. -DANTLR_JAR_LOCATION=/usr/local/lib/antlr-4.7.2-complete.jar -DCMAKE_INSTALL_PREFIX=/usr/local -DWITH_DEMO=True
+make 
+sudo make install
+cd ~
+
+#安装qhull-7.2.1
+wget -O qhull-7.2.1.zip https://github.com.cnpmjs.org/qhull/qhull/archive/refs/tags/v7.2.1.zip
+unzip qhull-7.2.1.zip
+cd qhull-7.2.1/build && cmake .. && make 
+sudo make install 
+
+#安装boost-1.67
+wget https://sourceforge.net/projects/boost/files/boost/1.67.0/boost_1_67_0.tar.gz
+tar -zxf boost_1_67_0.tar.gz
+cd boost_1_67_0/
+./bootstrap.sh --prefix=/usr/local
+./b2
+sudo ./b2 install
+cd ../
+
+#安装原来的软件
+git clone https://github.com.cnpmjs.org/JianqiangDing/irafhy.git
+cd irafhy
+mkdir build && cd build
+cmake .. -DENABLE_TESTING=1 -DENABLE_EXAMPLES=1 -DENABLE_DOC=1
+#cmake .. -DENABLE_TESTING=1 -DENABLE_EXAMPLES=1 -DENABLE_DOC=1 -DPYTHON_INCLUDE_DIR=/usr/include/python2.7 -DPYTHON_LIBRARY=/usr/lib/python2.7/config-x86_64-linux-gnu/libpython2.7.so
+make
+make test
+
+#图形化运行docker
+sudo docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY -e GDK_SCALE -e GDK_DPI_SCALE ubuntu:latest /bin/bash
