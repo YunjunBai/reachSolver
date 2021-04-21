@@ -15,21 +15,5 @@
  Outputs:
      obj - Generated Object
 
- Reference:
-   CORA ../contSet/contSet/contSet.m 
  */
-#include <cstddef>
 
-namespace reachSolver {
-
-class Set{
-  protected:
-    int id;
-    size_t dimension;
-  public:
-    Set();
-    ~Set(){};
-    void display();
-};
-
-}
