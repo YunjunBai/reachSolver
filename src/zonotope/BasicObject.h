@@ -1,8 +1,8 @@
 /**
  * @file   BasicObject.h
- * @brief 
- * @author 
- * @date
+ * @brief  Basic class of these set representations
+ * @author Yunjun Bai
+ * @date April 2021
  * @version 1.0
  * 
  * @defgroup structure

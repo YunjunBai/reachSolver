@@ -1,8 +1,8 @@
 /**
  * @file   Zonotope.h
  * @brief  Zonotope class representation
- * @author 
- * @date
+ * @author Yunjun Bai
+ * @date April 2021
  * @version 1.0 
  * 
  * Reference:
@@ -149,6 +149,12 @@ class Zonotope : private BasicObject {
 	bool ChangeDimension(size_t new_dim);
 
 	/**
+	 * @brief Reduces the order of a zonotope
+	 * @param limitOrder order of reduced zonotope
+	 */
+	void Reduce(unsigned limitOrder);
+
+	/**
 	 * @brief Clears the generators and center of the Zonotope and sets dimensionality to zero
 	 */
 	void Clear();
@@ -182,11 +188,11 @@ class Zonotope : private BasicObject {
 	*                                                                           *
 	*****************************************************************************/
     /**
-	 * @brief Get the MinkowskiSum of two zonotope
+	 * @brief Get the enclosure for the convex hull of two zonotope
 	 * @param another_zonotope 
-	 * @return a sum zonotope
+	 * @return a  zonotope enclosing the convex hull
 	 */
-    Zonotope MinkowskiSum( const Zonotope& another_zonotope ) const;
+    Zonotope Convexhull( const Zonotope& another_zonotope ) const;
 };
 
 /** @} */
