@@ -22,8 +22,8 @@ namespace reachSolver{
 	 * @brief Constructor with no params
 	 */
      template <typename Number, typename Converter, typename Setting>
-     Zonotope<Number,Converter,Setting>::Zonotope()
-        :dimension_(0),center_((0,1)),generators_(0,0;0,0) { }
+     Zonotope<Number,Converter,Setting>::Zonotope():
+     dimension_(0),center_(Vector_t<Number>::Matrix()),generators_( Matrix_t<Number>::Matrix()){ }
 
     /**
 	 * @brief Constructor with dimension
