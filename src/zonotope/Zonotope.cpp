@@ -44,14 +44,20 @@ namespace reachSolver{
 	 */
     template <typename Number, typename Converter, typename Setting>
 	Zonotope<Number,Converter,Setting>::Zonotope(const Vector_t<Number>& center, const Matrix_t<Number>& generators):
-        dimension_(center.row()),
+        dimension_(center.rows()),
         center_(center),
         generators_(generators){
-        assert(center.row()==generators.row());
+        assert(center.rows()==generators.rows());
     }
 
     template <typename Number, typename Converter, typename Setting>
 	Zonotope<Number,Converter,Setting>:: ~Zonotope(){}
+
+    /*****************************************************************************
+	*                                                                           *
+	*                            Public Functions on Set Properties                                 *
+	*                                                                           *
+	*****************************************************************************/
 
 
     
