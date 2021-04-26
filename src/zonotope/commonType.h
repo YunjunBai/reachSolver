@@ -20,7 +20,7 @@ template <typename Number>
 using Matrix_t = Eigen::Matrix<Number, Eigen::Dynamic, Eigen::Dynamic>;
 
 template <typename Number>
-using Vector_set_t = std::set<vector_t<Number>>;
+using Vector_set_t = std::Set<vector_t<Number>>;
 
 enum class REACHABILITY_RESULT {
 	SAFE,
