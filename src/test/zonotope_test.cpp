@@ -8,7 +8,7 @@
  */
 
 #include "test.h"
-#include "zonotope/Zonotope.h"
+#include "../zonotope/Zonotope.h"
 
 #include "gtest/gtest.h"
 #include <iostream>

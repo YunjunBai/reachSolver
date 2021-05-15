@@ -18,11 +18,10 @@ namespace reachSolver {
  * @class      Zonotope 
  * @brief      Class for Zonotopes.
  * @tparam     Number     The used number type.
- * @tparam     Converter  The converter.
  * @ingroup    structure
  * @{
  */
-template <typename Number, typename Converter, typename Setting>
+template <typename Number>
 class Zonotope : private BasicObject {
   private:
     size_t dimension_;
@@ -156,7 +155,7 @@ class Zonotope : private BasicObject {
 	 * @param another_zonotope 
 	 * @return True, if equal
 	 */
-    bool operator==(const ZonotopeT<Number, Converter, Setting>& another_zonotope) const {
+    bool operator==(const Zonotope<Number>& another_zonotope) const {
 		if ( this->dimension_ != another_zonotope.dimension() ) {
 			return false;
 		}

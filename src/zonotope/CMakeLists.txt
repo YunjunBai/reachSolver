@@ -1,16 +1,18 @@
 # Create object library first
 file(GLOB_RECURSE sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)
-add_library(${PROJECT_NAME}-objects OBJECT ${sources})
-target_include_dirs_from(${PROJECT_NAME}-objects SYSTEM PUBLIC EIGEN3 Boost_SHARED)
-target_include_directories(${PROJECT_NAME}-objects
-		PRIVATE ${${PROJECT_NAME}_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}
-		PUBLIC
-		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-		$<INSTALL_INTERFACE:include/${PROJECT_NAME}>
-	)
+list(FILTER sources EXCLUDE REGEX old.cpp)
+
+#add_library(${PROJECT_NAME}-objects OBJECT ${sources})
+#target_include_dirs_from(${PROJECT_NAME}-objects SYSTEM PUBLIC EIGEN3 Boost_SHARED)
+#target_include_directories(${PROJECT_NAME}-objects
+#		PRIVATE ${${PROJECT_NAME}_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}
+#		PUBLIC
+#		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+#		$<INSTALL_INTERFACE:include/${PROJECT_NAME}>
+#	)
 
 # Create static and shared libraries
-add_library(${PROJECT_NAME}-static STATIC $<TARGET_OBJECTS:${PROJECT_NAME}-objects>)
+add_library(${PROJECT_NAME}-static STATIC ${sources})
 set_target_properties( ${PROJECT_NAME}-static PROPERTIES
     VERSION "${PROJECT_VERSION}"
     SOVERSION "${PROJECT_VERSION}"
@@ -20,8 +22,9 @@ set_target_properties( ${PROJECT_NAME}-static PROPERTIES
     LINKER_LANGUAGE CXX
 )
 target_link_libraries(${PROJECT_NAME}-static PUBLIC ${${PROJECT_NAME}_LIBRARIES_STATIC})
+target_link_libraries(${PROJECT_NAME}-static PUBLIC pthread)
 
-add_library(${PROJECT_NAME}-shared SHARED $<TARGET_OBJECTS:${PROJECT_NAME}-objects>)
+add_library(${PROJECT_NAME}-shared SHARED ${sources})
 set_target_properties( ${PROJECT_NAME}-shared PROPERTIES
     VERSION "${PROJECT_VERSION}"
     SOVERSION "${PROJECT_VERSION}"
@@ -31,6 +34,7 @@ set_target_properties( ${PROJECT_NAME}-shared PROPERTIES
     LINKER_LANGUAGE CXX
 )
 target_link_libraries(${PROJECT_NAME}-shared PUBLIC ${${PROJECT_NAME}_LIBRARIES_DYNAMIC})
+target_link_libraries(${PROJECT_NAME}-shared PUBLIC pthread)
 
 ########################################################################################
 #cotire(${PROJECT_NAME}-shared)

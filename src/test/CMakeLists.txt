@@ -1,7 +1,3 @@
-add_custom_target(allTests
-        DEPENDS ${PROJECT_NAME}
-)
-
 set(test_sources
         zonotope_test.cpp
 )
@@ -16,12 +12,10 @@ target_include_directories(runUnitTests PRIVATE ${GTEST_INCLUDE_DIR})
 
 target_link_libraries(
         runUnitTests LINK_PUBLIC
-        ${GTEST_LIBRARIES}
         ${PROJECT_NAME}-shared
+        gtest_main
+        gtest
+        pthread
 )
 
-#cotire(runUnitTests)
-
 add_test(NAME test COMMAND runUnitTests)
-
-add_dependencies(allTests runUnitTests)
