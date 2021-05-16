@@ -12,6 +12,7 @@
 
 #pragma once
 #include <cstddef>
+#include <iostream>
 #include "commonType.h"
 
 namespace reachSolver {

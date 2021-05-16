@@ -91,7 +91,7 @@ void Zonotope<Number>::set_center(const Vector_t<Number>& center){
     assert((std::size_t)center.rows() == dimension_ && "Center has to have same dimensionality as zonotope." );
     center_ = center;
     // uniteEqualVectors();
-    // removeEmptyGenerators();
+    DeleteZeroGenerators();
 }
 
 /**
@@ -109,14 +109,14 @@ const Matrix_t<Number>& Zonotope<Number>::generators() const{
  */
 template <typename Number>
 void Zonotope<Number>::set_generators(const Matrix_t<Number>& generators){
-    if (dimension_ == 0) {
+    if (dimension_ == 0){
         dimension_ = generators.rows();
         center_ = Vector_t<Number>::Zero(dimension_);
     }
     assert((std::size_t)generators.rows() == dimension_ && "Generators have to have same dimensionality as zonotope" );
     generators_ = generators;
     // uniteEqualVectors();
-    // removeEmptyGenerators();
+    DeleteZeroGenerators();
 }
 
 /**
@@ -126,7 +126,20 @@ void Zonotope<Number>::set_generators(const Matrix_t<Number>& generators){
  */
 template <typename Number>
 bool Zonotope<Number>::AddGenerators(const Matrix_t<Number>& generators){
-    
+    if (dimension_ == 0){
+        dimension_ = generators.rows();
+        center_ = Vector_t<Number>::Zero(dimension_);
+        generators_ = generators;
+        return true;
+    }
+    assert((std::size_t)generators.rows() == dimension_ && "Added generators have to have same dimensionality as zonotope" );
+    Matrix_t<Number> tmp = generators_;
+    generators_.resize( tmp.rows(), generators.cols() + tmp.cols() );
+    generators_ << tmp, generators;
+
+    // uniteEqualVectors();
+    DeleteZeroGenerators();
+    return true;
 }
 
 /**
@@ -136,10 +149,10 @@ bool Zonotope<Number>::AddGenerators(const Matrix_t<Number>& generators){
 template <typename Number>
 Number Zonotope<Number>::order() const{
     // object empty.
-    if ( generators_.rows() == 0 ) {
+    if (generators_.rows() == 0){
         return Number( 0 );
     }
-    return Number( generators_.cols() ) / Number( generators_.rows() );
+    return Number(generators_.cols()) / Number(generators_.rows());
 }
 
 /**
@@ -148,7 +161,20 @@ Number Zonotope<Number>::order() const{
  */
 template <typename Number>
 size_t Zonotope<Number>::numGenerators() const{
+    return generators_.cols();
+}
 
+template <typename Number>
+void Zonotope<Number>::RemoveGenerator(unsigned int colomn){
+    Eigen::Index numRows = generators_.rows();
+    Eigen::Index numCols = generators_.cols() - 1;
+
+    if (colomn < numCols) {
+        generators_.block(0, colomn, numRows, numCols - colomn) =
+                generators_.block(0, colomn + 1, numRows, numCols - colomn);
+    }
+
+    generators_.conservativeResize(numRows, numCols);
 }
 
 /**
@@ -156,7 +182,18 @@ size_t Zonotope<Number>::numGenerators() const{
  */
 template <typename Number>
 void Zonotope<Number>::DeleteZeroGenerators(){
+    Vector_t<Number> zero_vector = Vector_t<Number>::Zero(dimension_);
 
+    std::vector<unsigned> zeroIndex;
+    for (unsigned i = 0; i < generators_.cols(); i++) {
+        if (generators_.col(i) == zero_vector) {
+            zeroIndex.push_back( i );
+        }
+    }
+
+    for (std::vector<unsigned>::reverse_iterator r_it = zeroIndex.rbegin();r_it != zeroIndex.rend(); ++r_it) {
+        RemoveGenerator(*r_it);
+    }
 }
 
 /**
@@ -166,7 +203,22 @@ void Zonotope<Number>::DeleteZeroGenerators(){
  */
 template <typename Number>
 bool Zonotope<Number>::ChangeDimension(size_t new_dim){
+	assert( new_dim != 0 && "Cannot change dimensionality of zonotope to zero" );
+	if (new_dim == dimension_){
+		return false;
+	}else{
+		center_.conservativeResize(new_dim, Eigen::NoChange);
+		generators_.conservativeResize(new_dim, Eigen::NoChange);
 
+		// If new dim > old dim, initialize all new rows to zero
+		for (unsigned i = dimension_; i < new_dim; i++){
+			center_.row(i).setZero();
+			generators_.row(i).setZero();
+		}
+
+		dimension_ = new_dim;
+		return true;
+	}
 }
 
 /**
@@ -175,7 +227,7 @@ bool Zonotope<Number>::ChangeDimension(size_t new_dim){
  */
 template <typename Number>
 void Zonotope<Number>::Reduce(unsigned limitOrder){
-
+    
 }
 
 /**
@@ -183,7 +235,9 @@ void Zonotope<Number>::Reduce(unsigned limitOrder){
  */
 template <typename Number>
 void Zonotope<Number>::Clear(){
-    
+    generators_.resize(0, 0);
+    center_.resize(0, 1);
+    dimension_ = 0;
 }
 
 /**
@@ -191,7 +245,9 @@ void Zonotope<Number>::Clear(){
  */
 template <typename Number>
 void Zonotope<Number>::Display() const{
-    
+    std::cout << "This Zonotope's dimension is " << dimension_ << std::endl;
+    std::cout << "This Zonotope's center is " << center_ << std::endl;
+    std::cout << "This Zonotope's generators are " << generators_ << std::endl;
 }
 
 /*****************************************************************************
@@ -206,8 +262,13 @@ void Zonotope<Number>::Display() const{
  * @return a  zonotope = matrix * this zonotope
  */
 template <typename Number>
-Zonotope<Number> Zonotope<Number>::Times( const Matrix_t<Number>& matrix ) const{
-    
+Zonotope<Number> Zonotope<Number>::Times(const Matrix_t<Number>& matrix) const{
+	assert(matrix.cols() == center_.rows());
+	assert(matrix.cols() == center_.rows());
+	Zonotope<Number> result;
+	result.set_center(matrix * center_ );
+	result.set_generators(matrix * generators_);
+	return result;
 }
 
 /**
@@ -216,8 +277,18 @@ Zonotope<Number> Zonotope<Number>::Times( const Matrix_t<Number>& matrix ) const
  * @return a  zonotope = zonotope1 + zonotope2
  */
 template <typename Number>
-Zonotope<Number> Zonotope<Number>::Plus( const Zonotope& another_zonotope ) const{
-    
+Zonotope<Number> Zonotope<Number>::Plus(const Zonotope& another_zonotope) const{
+    assert(dimension_ == another_zonotope.dimension());
+    Zonotope<Number> sum;
+    sum.set_center(this->center_ + another_zonotope.center());
+    Matrix_t<Number> sum_generators;
+    sum_generators.resize(dimension_, generators_.cols() + another_zonotope.generators().cols());
+    sum_generators << generators_, another_zonotope.generators();
+    sum.set_generators(sum_generators);
+    //sum.uniteEqualVectors();
+    sum.DeleteZeroGenerators();
+    //sum.reduce();
+    return sum;
 }
 
 /**
@@ -226,7 +297,7 @@ Zonotope<Number> Zonotope<Number>::Plus( const Zonotope& another_zonotope ) cons
  * @return a  zonotope enclosing the convex hull
  */
 template <typename Number>
-Zonotope<Number> Zonotope<Number>::Convexhull( const Zonotope& another_zonotope ) const{
+Zonotope<Number> Zonotope<Number>::Convexhull(const Zonotope& another_zonotope) const{
     
 }
 

@@ -179,21 +179,21 @@ class Zonotope : private BasicObject {
 	 * @param matrix a matrix
 	 * @return a  zonotope = matrix * this zonotope
 	 */
-    Zonotope Times( const Matrix_t<Number>& matrix ) const;
+    Zonotope Times(const Matrix_t<Number>& matrix) const;
 
 	/**
 	 * @brief Get the minkowski addition of two zonotope,i.e., "+" operator
 	 * @param another_zonotope 
 	 * @return a  zonotope = zonotope1 + zonotope2
 	 */
-    Zonotope Plus( const Zonotope& another_zonotope ) const;
+    Zonotope Plus(const Zonotope& another_zonotope) const;
 
     /**
 	 * @brief Get the enclosure for the convex hull of two zonotope
 	 * @param another_zonotope 
 	 * @return a  zonotope enclosing the convex hull
 	 */
-    Zonotope Convexhull( const Zonotope& another_zonotope ) const;
+    Zonotope Convexhull(const Zonotope& another_zonotope) const;
 };
 
 /** @} */
