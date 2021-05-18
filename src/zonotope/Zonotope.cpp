@@ -117,6 +117,77 @@ void Zonotope<Number,Converter,Setting>::set_generators(const Matrix_t<Number>& 
     // uniteEqualVectors();
     // removeEmptyGenerators();
 }
+
+/**
+ * @brief Add generators to Zonotope. Simply performs setGenerators if generators was previously not initialized.
+ * @param generators a nxm matrix
+ * @return true if able to add generators
+ */
+template <typename Number, typename Converter, typename Setting>
+bool Zonotope<Number,Converter,Setting>::AddGenerators(const Matrix_t<Number>& generators){
+
+}
+
+/**
+ * @brief Get the order
+ * @return zonotope order
+ */
+template <typename Number, typename Converter, typename Setting>
+Number Zonotope<Number,Converter,Setting>::order() const{
+
+}
+
+/**
+ * @brief Number of generators
+ * @return number of generators
+ */
+template <typename Number, typename Converter, typename Setting>
+size_t Zonotope<Number,Converter,Setting>::numGenerators() const{
+
+}
+
+/**
+ * @brief Removes zero generators in generator matrix
+ */
+template <typename Number, typename Converter, typename Setting>
+void Zonotope<Number,Converter,Setting>::DeleteZeroGenerators(){
+
+}
+
+/**
+ * @brief Changes the dimension of a Zonotope. if new_dim > old dim, new rows are initialized with null
+ * @param new_dim The new dimension of the Zonotope
+ * @return True, if change in dimension was successful
+ */
+template <typename Number, typename Converter, typename Setting>
+bool Zonotope<Number,Converter,Setting>::ChangeDimension(size_t new_dim){
+
+}
+
+/**
+ * @brief Reduces the order of a zonotope
+ * @param limitOrder order of reduced zonotope
+ */
+template <typename Number, typename Converter, typename Setting>
+void Zonotope<Number,Converter,Setting>::Reduce(unsigned limitOrder){
+
+}
+
+/**
+ * @brief Clears the generators and center of the Zonotope and sets dimensionality to zero
+ */
+template <typename Number, typename Converter, typename Setting>
+void Zonotope<Number,Converter,Setting>::Clear(){
+
+}
+
+/**
+ * @brief display the zonotope
+ */
+template <typename Number, typename Converter, typename Setting>
+void Zonotope<Number,Converter,Setting>::Display() const{
     
+}
+
 } // namespace reachSolver
 
