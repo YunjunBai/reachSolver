@@ -1,5 +1,5 @@
 set(test_sources
-        zonotope_test.cpp
+        ZonotopeTest.cpp
 )
 
 SET_SOURCE_FILES_PROPERTIES(${test_sources} PROPERTIES COMPILE_FLAGS -O0)

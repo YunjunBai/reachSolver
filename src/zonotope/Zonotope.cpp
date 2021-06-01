@@ -246,8 +246,8 @@ void Zonotope<Number>::Clear(){
 template <typename Number>
 void Zonotope<Number>::Display() const{
     std::cout << "This Zonotope's dimension is " << dimension_ << std::endl;
-    std::cout << "This Zonotope's center is " << center_ << std::endl;
-    std::cout << "This Zonotope's generators are " << generators_ << std::endl;
+    std::cout << "This Zonotope's center is \n" << center_ << std::endl;
+    std::cout << "This Zonotope's generators are \n" << generators_ << std::endl;
 }
 
 /*****************************************************************************
