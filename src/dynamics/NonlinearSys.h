@@ -13,8 +13,11 @@
 
 #include "BasicObject.h"
 #include "ReachableSet.h"
+#include <vector> 
 #include <string>
-
+#include "ReachOptions.h"
+#include "ReachableSet.h"
+#include "ReachSpecification.h"
 namespace reachSolver{
 
 /**
@@ -31,7 +34,7 @@ class NonlinearSys{
     std::string name_;
     size_t num_states_;
     size_t num_inputs_;
-    size_t num_outputs_;
+    //size_t num_outputs_;
 
     function_type mFile_;
     function_type jacobian_;
@@ -39,7 +42,9 @@ class NonlinearSys{
     function_type thirdOrderTensor_;
     function_type tensors_;
 
-    ReachableSet createReachSetObject(TimeInt& time_int, TimePoint time_point);
+    ReachableSet<Number> createReachSetObject(TimeInt& time_int, TimePoint& time_point);
+
+    std::vector<size_t> numberOfInputs(function_type fun_handle, size_t inpArgs);
 
   public:
     /****************************************************************************
@@ -145,7 +150,7 @@ class NonlinearSys{
      * @param R object of class reachSet storing the computed reachable set
      * @return 1 if specifications are satisfied, 0 if not
      */
-    int reach(ReachOptions& options, ReachSpecification& spec, ReachableSet& R);
+    int reach(ReachOptions& options, ReachSpecification& spec, ReachableSet<Number> & R)
 
     /**
      * @brief checks if all necessary options are there and have valid values
