@@ -126,8 +126,58 @@ ReachableSet<Number> NonlinearSys<Number>::createReachSetObject(TimeInt& time_in
 
 template <typename Number>
 int NonlinearSys<Number>::reach(ReachOptions& options, ReachSpecification& spec, ReachableSet<Number> & R){
-    
-}
+    // options preprocessing
+    options = checkOptionsReach(options, 0);
+    // compute symbolic derivatives
+    derivatives(options);
 
-}
+    // obtain factors for initial state and input solution time step
+    int r = options.time_step();
+    int *factor = new int[options.taylor_terms()+1];
+    for(size_t i = 1; i<=options.taylor_terms()+1; i++){
+        factor[i] = std::pow(r,i)/std::tgamma(i);
+    }
+    options.set_factor(factor);
+    options.set_t(options.tStart());
+    
+    // time period
+    int tmp_t_count = (options.tFinal()-options.tStart())/options.timeStep();
+    int *tmp_vec = new int[tmp_t_count];
+    for (size_t i = 0; i <= tmp_t_count; i++)
+    {
+        tmp_vec[i] = options.tStart()+options.time_step()*i;
+    }    
+    Vector_t<Number> tVec(tmp_vec);
+
+    // initialize cell-arrays that store the reachable set
+    TimeInt time_int = TimeInt(tmp_t_count-1);
+    TimePoint time_point = TimePoint(tmp_t_count-1);
+
+    // initialize reachable set computations
+    ReachableSet Rnext = ReachableSet();
+    try
+    {
+        Rnext = initReach(options.R0(), options);
+    }catch(SetExplosionException e1 )
+    {
+        std::cout << e.what() << std::endl;
+        return -1;
+    }catch(std::exception& e)
+    {
+        std::cout << "other Exception caught" << std::endl;
+        return -1;
+    }
+
+    // loop over all reachability steps
+    for (size_t i = 2; i < tVec.size(); i++)
+    {
+        time_int.set_set_rs(i-1, Rnext.time_interval());
+        time_int.set_time(i-1, );
+        time_point.set_set_rs(i-1, Rnext.time_point());
+        time_point.set_time(i-1, tVec[i]);
+    }
+    
+} // NonlinearSys<Number>::reach
+
+} //namespace reachSolver
 

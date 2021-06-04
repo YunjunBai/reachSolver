@@ -15,10 +15,20 @@
 #include "ReachableSet.h"
 #include <vector> 
 #include <string>
+#include <cmath>
+#include <exception>
 #include "ReachOptions.h"
 #include "ReachableSet.h"
 #include "ReachSpecification.h"
 namespace reachSolver{
+
+struct SetExplosionException : public std::exception
+{
+    const char * what () const throw ()
+    {
+        return "Set Explosion Exception!";
+    }
+};
 
 /**
  * @class      NonlinearSys 
@@ -172,7 +182,7 @@ class NonlinearSys{
      * @param options struct containing the algorithm settings
      * @return first reachable set
      */
-    ReachableSet initReach(ReachableSet& Rinit, ReachSpecification& options);
+    ReachableSet initReach(Zonotope<Number>& Rinit, ReachSpecification& options);
 
     /**
      * @brief computes the reachable continuous set for one time step of a nonlinear system by overapproximative linearization
