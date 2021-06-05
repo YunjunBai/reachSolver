@@ -22,7 +22,7 @@ typedef double NumberType;
  */
 class TimePoint{
   private:
-    std::vector<Zonotope<NumberType>*> set_;
+    std::vector<Zonotope<NumberType>> set_;
     std::vector<double> time_;
   public:
     
@@ -81,8 +81,12 @@ class TimePoint{
  */
 class TimeInt{
   private:
-    std::vector<Zonotope<NumberType>*> set_;
-    std::vector<double> time_;
+    struct Interval
+    {
+        double interval[2];
+    };
+    std::vector<Zonotope<NumberType>> set_;
+    std::vector<Interval> time_;
   public:
 
     /*****************************************************************************
@@ -122,13 +126,13 @@ class TimeInt{
      * @brief Get the time
      * @return the time
      */
-    const double time(int i) const;
+    const Interval time(int i) const;
 
     /**
      * @brief Replaces the current time with the parameter
      * @param time
      */
-    void set_time(int i, double time);
+    void set_time(int i, double time_start, double time_end);
 };
 /** @} */
 

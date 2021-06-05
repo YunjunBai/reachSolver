@@ -22,8 +22,8 @@ namespace reachSolver{
 template <typename Number>
 class ReachableSet{
   private:
-    Zonotope<Number> time_point_;
-    Zonotope<Number> time_interval_;
+    TimePoint time_point_;
+    TimeInt time_interval_;
     int parent_rs_; //index of parent reachable set
     int loc_; //index of the location
 
@@ -42,21 +42,21 @@ class ReachableSet{
      * @brief Constructor with TimePoint
      * @param time_point struct with fields .set and .time storing the time point reachable set
      */
-    explicit ReachableSet(Zonotope<Number>& time_point);
+    explicit ReachableSet(TimePoint& time_point);
 
     /**
      * @brief Constructor with two params
      * @param time_point struct with fields .set and .time storing the time point reachable set
      * @param parent index of the parent reachable set
      */
-    ReachableSet(Zonotope<Number>& time_point, int parent);
+    ReachableSet(TimePoint& time_point, int parent);
 
     /**
      * @brief Constructor with two params
      * @param time_point struct with fields .set and .time storing the time point reachable set
      * @param time_interval struct with fields .set, .time, and .algebraic (nonlinDAsys) storing the time interval reachable set
      */
-    ReachableSet(Zonotope<Number>& time_point, Zonotope<Number>& time_interval);
+    ReachableSet(TimePoint& time_point, TimeInt& time_interval);
 
     /**
      * @brief Constructor with three params
@@ -64,7 +64,7 @@ class ReachableSet{
      * @param parent index of the parent reachable set
      * @param loc index of the location
      */
-    ReachableSet(Zonotope<Number>& time_point, int parent, int loc);
+    ReachableSet(TimePoint& time_point, int parent, int loc);
 
     /**
      * @brief Constructor with three params
@@ -72,7 +72,7 @@ class ReachableSet{
      * @param time_interval struct with fields .set, .time, and .algebraic (nonlinDAsys) storing the time interval reachable set
      * @param parent index of the parent reachable set
      */
-    ReachableSet(Zonotope<Number>& time_point, Zonotope<Number>& time_interval, int parent);
+    ReachableSet(TimePoint& time_point, TimeInt& time_interval, int parent);
 
     /**
      * @brief Constructor with four params
@@ -87,7 +87,7 @@ class ReachableSet{
      * @brief Copy Constructor - constructs a ReachableSet from an existing one.
      * @param other Another ReachableSet, from which a new ReachableSet is constructed
      */
-    ReachableSet(const ReachableSet& other) = default;
+    ReachableSet(const ReachableSet<Number>& other) = default;
 
     virtual ~ReachableSet();
 
@@ -101,13 +101,13 @@ class ReachableSet{
      * @brief Get the time_point
      * @return time_point
      */
-    const Zonotope<Number> time_point() const;
+    const TimePoint time_point() const;
 
     /**
      * @brief Get the time_interval
      * @return time_interval
      */
-    const Zonotope<Number> time_interval() const;
+    const TimeInt time_interval() const;
 
     /**
      * @brief Get the parent_rs
@@ -120,6 +120,20 @@ class ReachableSet{
      * @return loc
      */
     const int loc() const;
+
+    /*****************************************************************************
+    *                                                                           *
+    *                       Other Functions                                     *
+    *                                                                           *
+    *****************************************************************************/
+    
+    /**
+     * @brief delete reachable sets that are already covered by other sets
+     * @param Rold reachable sets of previous time steps
+     * @param options options for the computation of the reachable set
+     * @return R - reachable sets
+     */
+    ReachableSet<Number> deleteRedundantSets(ReachableSet<Number> Rold, ReachSpecification& options);
 };
 /** @} */
 }

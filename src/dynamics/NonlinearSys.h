@@ -12,7 +12,6 @@
 #pragma once
 
 #include "BasicObject.h"
-#include "ReachableSet.h"
 #include <vector> 
 #include <string>
 #include <cmath>
@@ -55,6 +54,8 @@ class NonlinearSys{
     ReachableSet<Number> createReachSetObject(TimeInt& time_int, TimePoint& time_point);
 
     std::vector<size_t> numberOfInputs(function_type fun_handle, size_t inpArgs);
+
+    ReachableSet<Number> initReach_linRem(Zonotope<Number>& Rinit, ReachSpecification& options);
 
   public:
     /****************************************************************************
@@ -160,7 +161,7 @@ class NonlinearSys{
      * @param R object of class reachSet storing the computed reachable set
      * @return 1 if specifications are satisfied, 0 if not
      */
-    int reach(ReachOptions& options, ReachSpecification& spec, ReachableSet<Number> & R)
+    int reach(ReachOptions& options, ReachSpecification& spec, ReachableSet<Number> & R);
 
     /**
      * @brief checks if all necessary options are there and have valid values
@@ -182,7 +183,7 @@ class NonlinearSys{
      * @param options struct containing the algorithm settings
      * @return first reachable set
      */
-    ReachableSet initReach(Zonotope<Number>& Rinit, ReachSpecification& options);
+    ReachableSet<Number> initReach(Zonotope<Number>& Rinit, ReachSpecification& options);
 
     /**
      * @brief computes the reachable continuous set for one time step of a nonlinear system by overapproximative linearization
@@ -190,7 +191,7 @@ class NonlinearSys{
      * @param options options for the computation of the reachable set
      * @return reachable set of the next time step
      */
-    ReachableSet post(ReachableSet& R, ReachSpecification& options);
+    ReachableSet<Number> post(ReachableSet<Number>& R, ReachSpecification& options);
 
     /**
      * @brief computes the reachable set after linearization
@@ -200,7 +201,7 @@ class NonlinearSys{
      * @param Rtp reachable set for time point
      * @return dimForSplit - dimension that is split to reduce the lin. error
      */
-    int linReach(ReachSpecification& options, ReachableSet& Rstart, ReachableSet& Rti, ReachableSet& Rtp);
+    int linReach(ReachSpecification& options, ReachableSet<Number>& Rstart, ReachableSet<Number>& Rti, ReachableSet<Number>& Rtp);
 
 };
 

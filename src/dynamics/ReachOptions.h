@@ -39,6 +39,9 @@ class ReachOptions{
 
     NumberType *factor_;
 
+    int verbose_;
+    std::string alg_;
+
   public:
     /*****************************************************************************
     *                                                                           *
@@ -213,6 +216,30 @@ class ReachOptions{
    * @param factor
    */
     void set_factor(NumberType* factor);
+
+    /**
+     * @brief Get the verbose
+     * @return the verbose
+     */
+    const int verbose() const;
+
+    /**
+     * @brief Replaces the verbose with the parameter
+     * @param verbose
+     */
+    void set_verbose(int verbose);
+
+    /**
+     * @brief Get the alg
+     * @return the alg
+     */
+    const std::string alg() const;
+
+    /**
+     * @brief Replaces the alg with the parameter
+     * @param alg
+     */
+    void set_alg(std::string alg);
     
 };
 /** @} */
