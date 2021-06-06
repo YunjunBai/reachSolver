@@ -6,6 +6,7 @@
 
 cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR)
 project(reachsolver CXX C)
+# set(CMAKE_VERBOSE_MAKEFILE on)
 
 # Settings
 set(PROJECT_FULLNAME "ReachSolver")

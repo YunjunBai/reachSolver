@@ -8,6 +8,10 @@
  */
 
 #pragma once
+#include <eigen3/Eigen/Core>
+#include <eigen3/Eigen/Dense>
+#include <eigen3/Eigen/StdVector>
+#include <set>
 
 namespace reachSolver{
 
@@ -20,11 +24,11 @@ template <typename Number>
 using Matrix_t = Eigen::Matrix<Number, Eigen::Dynamic, Eigen::Dynamic>;
 
 template <typename Number>
-using Vector_set_t = std::Set<vector_t<Number>>;
+using Vector_set_t = std::set<Vector_t<Number>>;
 
 enum class REACHABILITY_RESULT {
-	SAFE,
-	UNKNOWN
+    SAFE,
+    UNKNOWN
 };
 
 
