@@ -20,27 +20,27 @@ namespace reachSolver{
  * @{
  */
 
-typedef double NumberType;
+template <typename Number>
 class ReachOptions{
   private:
     int t_;
-    int tStart_;
-    int tFinal_;
-    Zonotope<NumberType> R0_;
-    Zonotope<NumberType> U_;
+    double tStart_;
+    double tFinal_;
+    Zonotope<Number> R0_;
+    Zonotope<Number> U_;
 
-    int time_step_;
+    double time_step_;
     int taylor_terms_;
     int zonotope_order_;
     int intermediate_order_;
     int error_order_;
-    int alg_;
     int tensor_order_;
 
-    NumberType *factor_;
+    Number *factor_;
 
     int verbose_;
     std::string alg_;
+    int max_error_;
 
   public:
     /*****************************************************************************
@@ -101,25 +101,25 @@ class ReachOptions{
      * @brief Get the R0
      * @return the R0
      */
-    const Zonotope<NumberType> R0() const;
+    const Zonotope<Number> R0() const;
 
     /**
      * @brief Replaces the R0 with the parameter
      * @param R0
      */
-    void set_R0(Zonotope<NumberType> R0);
+    void set_R0(Zonotope<Number> R0);
     
     /**
      * @brief Get the U
      * @return the U
      */
-    const Zonotope<NumberType> U() const;
+    const Zonotope<Number> U() const;
 
     /**
      * @brief Replaces the U with the parameter 
      * @param U
      */
-    void set_U(Zonotope<NumberType> U);
+    void set_U(Zonotope<Number> U);
     
     /**
      * @brief Get the time_step
@@ -182,18 +182,6 @@ class ReachOptions{
     void set_error_order(int error_order);
     
     /**
-     * @brief Get the alg
-     * @return the alg
-     */
-    const int alg() const;
-
-    /**
-     * @brief Replaces the alg with the parameter
-     * @param alg
-     */
-    void set_alg(int alg);
-
-    /**
      * @brief Get the tensor_order
      * @return the tensor_order
      */
@@ -209,13 +197,13 @@ class ReachOptions{
    * @brief Get the factor
    * @return the factor
    */
-    const NumberType* factor() const;
+    const Number* factor() const;
 
     /**
    * @brief Replaces the factor with the parameter
    * @param factor
    */
-    void set_factor(NumberType* factor);
+    void set_factor(Number* factor);
 
     /**
      * @brief Get the verbose
@@ -240,6 +228,18 @@ class ReachOptions{
      * @param alg
      */
     void set_alg(std::string alg);
+
+    /**
+     * @brief Get the max_error
+     * @return the max_error
+     */
+    const int max_error() const;
+
+    /**
+     * @brief Replaces the max_error with the parameter
+     * @param max_error
+     */
+    void set_max_error(int max_error);
     
 };
 /** @} */

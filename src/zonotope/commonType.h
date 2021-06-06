@@ -27,8 +27,8 @@ template <typename Number>
 using Vector_set_t = std::set<Vector_t<Number>>;
 
 enum class REACHABILITY_RESULT {
-	SAFE,
-	UNKNOWN
+    SAFE,
+    UNKNOWN
 };
 
 

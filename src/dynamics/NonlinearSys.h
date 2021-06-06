@@ -11,23 +11,10 @@
 
 #pragma once
 
-#include "BasicObject.h"
-#include <vector> 
-#include <string>
-#include <cmath>
-#include <exception>
-#include "ReachOptions.h"
-#include "ReachableSet.h"
-#include "ReachSpecification.h"
+#include "ContDynamics.h"
+#include "LinearSys.h"
 namespace reachSolver{
 
-struct SetExplosionException : public std::exception
-{
-    const char * what () const throw ()
-    {
-        return "Set Explosion Exception!";
-    }
-};
 
 /**
  * @class      NonlinearSys 
@@ -36,26 +23,43 @@ struct SetExplosionException : public std::exception
  * @{
  */
 template <typename Number>
-class NonlinearSys{
+class NonlinearSys : private ContDynamics{
   private:
-    typedef Number (*function_type)(Number param1, Number param2);
-
-    std::string name_;
-    size_t num_states_;
-    size_t num_inputs_;
-    //size_t num_outputs_;
-
+    typedef Vector_t<Number> (*function_type)(Vector_t<Number> param1, Number param2);
+    struct linerror_p_type
+    {
+        Vector_t<Number> u;
+        Vector_t<Number> x;
+    };
+    struct linerror_type
+    {
+        Vector_t<Number> f0;
+        linerror_p_type p;
+    };
+     
     function_type mFile_;
     function_type jacobian_;
     function_type hessian_;
     function_type thirdOrderTensor_;
     function_type tensors_;
 
-    ReachableSet<Number> createReachSetObject(TimeInt& time_int, TimePoint& time_point);
+    linerror_type linerror_;
 
+    // used in constructor
     std::vector<size_t> numberOfInputs(function_type fun_handle, size_t inpArgs);
 
-    ReachableSet<Number> initReach_linRem(Zonotope<Number>& Rinit, ReachSpecification& options);
+    // used in reach
+    ReachableSet<Number> createReachSetObject(TimeInt<Number>& time_int, TimePoint<Number>& time_point);
+
+    // used in initReach
+    ReachableSet<Number> initReach_linRem(std::vector<ReachableSetElement<Number>>& Rinit, ReachOptions<Number>& options);
+
+    std::vector<Zonotope<Number>> split(Zonotope<Number> input, int number);
+
+    // used in linReach
+    LinearSys<Number> linearize(ReachOptions<Number>& options, Zonotope<Number>& R, ReachOptions<Number>& linOptions);
+
+    double linReach_linRem(ReachableSet<Number>& R, Zonotope<Number>& Rinit, Zonotope<Number>& Rdelta, ReachOptions<Number>& options, ReachableSetElement<Number>& Rti, ReachableSetElement<Number>& Rtp);
 
   public:
     /****************************************************************************
@@ -112,11 +116,6 @@ class NonlinearSys{
     *                       Public Functions on Properties                      *
     *                                                                           *
     *****************************************************************************/
-    const std::string name() const;
-
-    const size_t num_states() const;
-
-    const size_t num_inputs() const;
 
     /**
      * @brief Get the mFile handle
@@ -148,6 +147,18 @@ class NonlinearSys{
      */
     const function_type tensors() const;
 
+    /**
+     * @brief Get the linerror
+     * @return linerror
+     */
+    const linerror_type linerror() const;
+
+    /**
+     * @brief Set the linerror
+     * @param linerror
+     */
+    void set_linerror(linerror_type linerror) const;
+
     /*****************************************************************************
     *                                                                           *
     *                       Compute Reachable Set                               *
@@ -161,7 +172,7 @@ class NonlinearSys{
      * @param R object of class reachSet storing the computed reachable set
      * @return 1 if specifications are satisfied, 0 if not
      */
-    int reach(ReachOptions& options, ReachSpecification& spec, ReachableSet<Number> & R);
+    int reach(ReachOptions<Number>& options, ReachSpecification& spec, ReachableSet<Number> & R);
 
     /**
      * @brief checks if all necessary options are there and have valid values
@@ -169,13 +180,13 @@ class NonlinearSys{
      * @param hyb called from hybrid Automaton (0/1)
      * @return options for nonlinearSys
      */
-    ReachOptions checkOptionsReach(ReachSpecification& options, int hyb);
+    ReachOptions<Number> checkOptionsReach(ReachOptions<Number>& options, int hyb);
 
     /**
      * @brief computes multivariate derivatives (jacobians, hessians, etc.) of nonlinear systems in a symbolic way; the result is stored in m-files and passed by a handle
      * @param options options struct
      */
-    void derivatives(ReachSpecification& options);
+    void derivatives(ReachOptions<Number>& options);
 
     /**
      * @brief computes the reachable continuous set for the first time step
@@ -183,7 +194,7 @@ class NonlinearSys{
      * @param options struct containing the algorithm settings
      * @return first reachable set
      */
-    ReachableSet<Number> initReach(Zonotope<Number>& Rinit, ReachSpecification& options);
+    ReachableSet<Number> initReach(std::vector<ReachableSetElement<Number>>& Rinit, ReachOptions<Number>& options);
 
     /**
      * @brief computes the reachable continuous set for one time step of a nonlinear system by overapproximative linearization
@@ -191,7 +202,7 @@ class NonlinearSys{
      * @param options options for the computation of the reachable set
      * @return reachable set of the next time step
      */
-    ReachableSet<Number> post(ReachableSet<Number>& R, ReachSpecification& options);
+    ReachableSet<Number> post(ReachableSet<Number>& R, ReachOptions<Number>& options);
 
     /**
      * @brief computes the reachable set after linearization
@@ -201,7 +212,7 @@ class NonlinearSys{
      * @param Rtp reachable set for time point
      * @return dimForSplit - dimension that is split to reduce the lin. error
      */
-    int linReach(ReachSpecification& options, ReachableSet<Number>& Rstart, ReachableSet<Number>& Rti, ReachableSet<Number>& Rtp);
+    int linReach(ReachOptions<Number>& options, ReachableSetElement<Number>& Rstart, ReachableSetElement<Number>& Rti, ReachableSetElement<Number>& Rtp);
 
 };
 

@@ -203,22 +203,22 @@ void Zonotope<Number>::DeleteZeroGenerators(){
  */
 template <typename Number>
 bool Zonotope<Number>::ChangeDimension(size_t new_dim){
-	assert( new_dim != 0 && "Cannot change dimensionality of zonotope to zero" );
-	if (new_dim == dimension_){
-		return false;
-	}else{
-		center_.conservativeResize(new_dim, Eigen::NoChange);
-		generators_.conservativeResize(new_dim, Eigen::NoChange);
+    assert( new_dim != 0 && "Cannot change dimensionality of zonotope to zero" );
+    if (new_dim == dimension_){
+        return false;
+    }else{
+        center_.conservativeResize(new_dim, Eigen::NoChange);
+        generators_.conservativeResize(new_dim, Eigen::NoChange);
 
-		// If new dim > old dim, initialize all new rows to zero
-		for (unsigned i = dimension_; i < new_dim; i++){
-			center_.row(i).setZero();
-			generators_.row(i).setZero();
-		}
+        // If new dim > old dim, initialize all new rows to zero
+        for (unsigned i = dimension_; i < new_dim; i++){
+            center_.row(i).setZero();
+            generators_.row(i).setZero();
+        }
 
-		dimension_ = new_dim;
-		return true;
-	}
+        dimension_ = new_dim;
+        return true;
+    }
 }
 
 /**
@@ -263,12 +263,12 @@ void Zonotope<Number>::Display() const{
  */
 template <typename Number>
 Zonotope<Number> Zonotope<Number>::Times(const Matrix_t<Number>& matrix) const{
-	assert(matrix.cols() == center_.rows());
-	assert(matrix.cols() == center_.rows());
-	Zonotope<Number> result;
-	result.set_center(matrix * center_ );
-	result.set_generators(matrix * generators_);
-	return result;
+    assert(matrix.cols() == center_.rows());
+    assert(matrix.cols() == center_.rows());
+    Zonotope<Number> result;
+    result.set_center(matrix * center_ );
+    result.set_generators(matrix * generators_);
+    return result;
 }
 
 /**

@@ -11,18 +11,24 @@
 
 #include "BasicObject.h"
 #include "Zonotope.h"
+#include "ReachableSet.h"
 namespace reachSolver{
 
-typedef double NumberType;
+struct Interval
+{
+    double interval[2];
+};
+
 /**
  * @class      TimePoint 
  * @brief      Class for TimePoint.
  * @ingroup    structure
  * @{
  */
+template <typename Number>
 class TimePoint{
   private:
-    std::vector<Zonotope<NumberType>> set_;
+    std::vector<std::vector<ReachableSetElement<Number>>> set_;
     std::vector<double> time_;
   public:
     
@@ -51,13 +57,13 @@ class TimePoint{
      * @brief Get the set(i)
      * @return the set
      */
-    const Zonotope<NumberType> set(int i) const;
+    const std::vector<ReachableSetElement<Number>> rs(int i) const;
 
     /**
      * @brief Replaces the current set with the parameter
      * @param set
      */
-    void set_set_rs(int i, Zonotope<NumberType>& set);
+    void set_rs(int i, ReachableSetElement<Number>& set);
 
     /**
      * @brief Get the time
@@ -79,13 +85,10 @@ class TimePoint{
  * @ingroup    structure
  * @{
  */
+template <typename Number>
 class TimeInt{
   private:
-    struct Interval
-    {
-        double interval[2];
-    };
-    std::vector<Zonotope<NumberType>> set_;
+    std::vector<std::vector<ReachableSetElement<Number>>> set_;
     std::vector<Interval> time_;
   public:
 
@@ -114,13 +117,13 @@ class TimeInt{
      * @brief Get the set(i)
      * @return the set
      */
-    const Zonotope<NumberType> set(int i) const;
+    const std::vector<ReachableSetElement<Number>> rs(int i) const;
 
     /**
      * @brief Replaces the current set with the parameter
      * @param set
      */
-    void set_set_rs(int i, Zonotope<NumberType>& set);
+    void set_rs(int i, std::vector<ReachableSetElement<Number>>& set);
 
     /**
      * @brief Get the time
