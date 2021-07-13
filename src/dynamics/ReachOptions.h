@@ -23,11 +23,13 @@ namespace reachSolver{
 template <typename Number>
 class ReachOptions{
   private:
-    int t_;
+    double t_;
     double tStart_;
     double tFinal_;
     Zonotope<Number> R0_;
     Zonotope<Number> U_;
+    Vector_t<Number> uTrans_;
+    Vector_t<Number> Rtrans_;
 
     double time_step_;
     int taylor_terms_;
@@ -41,6 +43,7 @@ class ReachOptions{
     int verbose_;
     std::string alg_;
     int max_error_;
+    int originContained_;
 
   public:
     /*****************************************************************************
@@ -65,37 +68,37 @@ class ReachOptions{
      * @brief Get the t
      * @return the t
      */
-    const int t() const;
+    const double t() const;
 
     /**
      * @brief Replaces the current t with the parameter
      * @param t
      */
-    void set_t(int t);
+    void set_t(double t);
 
     /**
      * @brief Get the tStart
      * @return the tStart
      */
-    const int tStart() const;
+    const double tStart() const;
 
     /**
      * @brief Replaces the current tStart with the parameter
      * @param tStart
      */
-    void set_tStart(int tStart);
+    void set_tStart(double tStart);
 
     /**
      * @brief Get the tFinal
      * @return the tFinal
      */
-    const int tFinal() const;
+    const double tFinal() const;
 
     /**
      * @brief Replaces the current tFinal with the parameter
      * @param tFinal
      */
-    void set_tFinal(int tFinal);
+    void set_tFinal(double tFinal);
     
     /**
      * @brief Get the R0
@@ -125,13 +128,13 @@ class ReachOptions{
      * @brief Get the time_step
      * @return the time_step
      */
-    const int time_step() const;
+    const double time_step() const;
 
     /**
      * @brief Replaces the time_step with the parameter
      * @param time_step
      */
-    void set_time_step(int time_step);
+    void set_time_step(double time_step);
     
     /**
      * @brief Get the taylor_terms
@@ -240,7 +243,31 @@ class ReachOptions{
      * @param max_error
      */
     void set_max_error(int max_error);
-    
+  
+    /** 
+     * @brief Get the uTrans
+     * @return the uTrans
+     */
+    const Vector_t<Number> uTrans() const;
+
+    /**
+     * @brief Replaces the max_error with the parameter
+     * @param max_error
+     */
+    void set_uTrans(Vector_t<Number> uTrans);
+
+    /**
+     * @brief Get the originContained
+     * @return the originContained
+     */
+    const int originContained() const;
+
+    /**
+     * @brief Replaces the originContained with the parameter
+     * @param originContained
+     */
+    void set_originContained(int originContained);
+
 };
 /** @} */
 }

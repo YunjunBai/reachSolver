@@ -108,6 +108,16 @@ ReachableSet<Number> NonlinearSys<Number>::createReachSetObject(TimeInt<Number>&
 }
 
 template <typename Number>
+ReachOptions<Number> NonlinearSys<Number>::checkOptionsReach(ReachOptions<Number>& options, int hyb){
+    return options;
+}
+
+template <typename Number>
+void NonlinearSys<Number>::derivatives(ReachOptions<Number>& options){
+    
+}
+
+template <typename Number>
 int NonlinearSys<Number>::reach(ReachOptions<Number>& options, ReachSpecification& spec, ReachableSet<Number> & R){
     int res = 1;
     // options preprocessing
@@ -208,18 +218,8 @@ int NonlinearSys<Number>::reach(ReachOptions<Number>& options, ReachSpecificatio
 } // NonlinearSys<Number>::reach
 
 template <typename Number>
-ReachOptions<Number> NonlinearSys<Number>::checkOptionsReach(ReachOptions<Number>& options, int hyb){
-    
-}
-
-template <typename Number>
-void NonlinearSys<Number>::derivatives(ReachOptions<Number>& options){
-    
-}
-
-template <typename Number>
 ReachableSet<Number> NonlinearSys<Number>::initReach_linRem(std::vector<ReachableSetElement<Number>>& Rinit, ReachOptions<Number>& options){
-
+    return ReachableSet<Number> ();
 }
 
 template <typename Number>
@@ -312,12 +312,69 @@ ReachableSet<Number> NonlinearSys<Number>::post(ReachableSet<Number>& R, ReachOp
 
 template <typename Number>
 LinearSys<Number> NonlinearSys<Number>::linearize(ReachOptions<Number>& options, Zonotope<Number>& R, ReachOptions<Number>& linOptions){
+    //linearization point p.u of the input is the center of the input set
+    linerror_p_type p;
+    p.u = options.uTrans();
 
+    //obtain linearization point
+    if(options.haslinearizationPoint() == true){
+        p.x = options.linearizationPoint();
+    }else{
+        // linearization point p.x of the state is the center of the last reachable set R translated by 0.5*delta_t*f0
+        Vector_t<Number> f0prev = mFile_(R.center(), p.u);
+        try
+        {
+            p.x = R.center() + f0prev*0.5*options.timeStep();
+        }catch(Exception e1 )
+        {
+            std::cout << "time step not yet created" << std::endl;
+            p.x = R.center();
+        }
+    }
+
+    // substitute p into the system equation to obtain the constant input
+    Vector_t<Number> f0 = mFile_(p.x, p.u);
+    
+    // substitute p into the Jacobian with respect to x and u to obtain the system matrix A and the input matrix B
+    Matrix_t<Number> A = new Matrix_t<Number>();
+    Matrix_t<Number> B = new Matrix_t<Number>();
+    jacobian_(p.x, p.u, A, B);
+    Matrix_t<Number> A_lin = A;
+    Matrix_t<Number> B_lin = B;
+    linOptions = options;
+    // if (strcmp(options.alg(),'linRem') == 0){
+    //     // in order to compute dA,dB, we use the reachability set computed for one step in initReach
+    //     [dA,dB] = lin_error2dAB(options.Ronestep,options.U,obj.hessian,p);
+    //     A = matZonotope(A,{dA});
+    //     B = matZonotope(B,{dB});
+    //     linSys = linParamSys(A,1,'constParam');
+    //     linOptions.compTimePoint = 1;
+    // }else{
+        //set up linearized system
+    LinearSys<Number> linSys = LinearSys("linSys", A, new Matrix_t<Number>(1)); 
+        //B=1 as input matrix encountered in uncertain inputs
+    // }
+
+    // set up options for linearized system
+    linOptions.set_U(B*(options.U()+options.uTrans()-p.u));
+    Vector_t<Number> Ucenter = linOptions.U().center();
+    linOptions.set_U(linOptions.U() - Ucenter);
+    linOptions.set_uTrans(zonotope([f0 + Ucenter,zeros(size(f0,1),1)]));
+    //linOptions.uTrans = zonotope(f0 + Ucenter);
+    linOptions.set_originContained(0);
+
+    //save constant input
+    linerror_.f0=f0;
+
+    //save linearization point
+    linError_.p=p;
+
+    return linSys;
 }
 
 template <typename Number>
 double NonlinearSys<Number>::linReach_linRem(ReachableSet<Number>& R, Zonotope<Number>& Rinit, Zonotope<Number>& Rdelta, ReachOptions<Number>& options, ReachableSetElement<Number>& Rti, ReachableSetElement<Number>& Rtp){
-
+    return 0;
 }
 
 template <typename Number>

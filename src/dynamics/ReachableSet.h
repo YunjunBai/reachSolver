@@ -272,22 +272,22 @@ class LinearReachableSet{
     /**
      * @brief Constructor with no params
      */
-    ReachableSet();
+    LinearReachableSet();
 
     /**
      * @brief Constructor with two params
      * @param time_point struct with fields .set and .time storing the time point reachable set
      * @param time_interval struct with fields .set, .time, and .algebraic (nonlinDAsys) storing the time interval reachable set
      */
-    ReachableSet(Zonotope<Number> & time_point, Zonotope<Number> & time_interval);
+    LinearReachableSet(Zonotope<Number> & time_point, Zonotope<Number> & time_interval);
 
     /**
      * @brief Copy Constructor - constructs a ReachableSet from an existing one.
      * @param other Another ReachableSet, from which a new ReachableSet is constructed
      */
-    ReachableSet(const ReachableSet<Number>& other) = default;
+    LinearReachableSet(const ReachableSet<Number>& other) = default;
 
-    virtual ~ReachableSet();
+    virtual ~LinearReachableSet();
 
     /*****************************************************************************
     *                                                                           *

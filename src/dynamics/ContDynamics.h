@@ -89,15 +89,6 @@ class ContDynamics{
 
     /**
      * @brief computes the solution due to the linearization error
-     * @param options struct containing the algorithm settings
-     * @param Vdyn set of admissible errors (dynamic)
-     * @param Vstat - set of admissible errors (static) (optional)
-     * @return  reachable set due to the linearization error
-     */
-    Zonotope<Number> error_solution(ReachOptions<Number>& options, Zonotope<Number> Vdyn, Zonotope<Number> Vstat);
-
-    /**
-     * @brief computes the solution due to the linearization error
      * @param options - options struct
      * @param R - reachable set (time-interval solution from linearized system + estimated set of abstraction errors)
      * @param Verrordyn - abstraction error (zonotope)

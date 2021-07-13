@@ -25,14 +25,23 @@ template <typename Number>
 class LinearSys : private ContDynamics{
   private:
 
-    Matrix_t<Number> A; //system matrix
-    Matrix_t<Number> B; //input matrix
-    Matrix_t<Number> c; //constant input
-    Matrix_t<Number> C; //output matrix
-    Matrix_t<Number> D; //throughput matrix
-    Matrix_t<Number> k; //output offset
-    Matrix_t<Number> taylor; 
-    Matrix_t<Number> krylov; 
+    struct taylor_type
+    {
+        double timeStep;
+        Matrix_t<Number> eAt;
+        Number F;
+        Number RV;
+        Number inputCorr;
+        Number Rtrans;
+    };
+    Matrix_t<Number> A_; //system matrix
+    Matrix_t<Number> B_; //input matrix
+    Matrix_t<Number> c_; //constant input
+    Matrix_t<Number> C_; //output matrix
+    Matrix_t<Number> D_; //throughput matrix
+    Matrix_t<Number> k_; //output offset
+    taylor_type taylor_; 
+    Matrix_t<Number> krylov_; 
 
   public:
     /****************************************************************************
@@ -45,6 +54,107 @@ class LinearSys : private ContDynamics{
      * @brief Constructor with no params
      */
     LinearSys();
+
+    /**
+     * @brief Constructor with two params
+     * @param A system matrix
+     * @param B input matrix
+     */
+    LinearSys(Matrix_t<Number>& A, Matrix_t<Number>& B);
+
+    /**
+     * @brief Constructor with three params
+     * @param A system matrix
+     * @param B input matrix
+     * @param c constant input
+     */
+    LinearSys(Matrix_t<Number>& A, Matrix_t<Number>& B, Matrix_t<Number>& c);
+
+    /**
+     * @brief Constructor with four params
+     * @param A system matrix
+     * @param B input matrix
+     * @param c constant input
+     * @param C output matrix
+     */
+    LinearSys(Matrix_t<Number>& A, Matrix_t<Number>& B, Matrix_t<Number>& c, Matrix_t<Number>& C);
+
+    /**
+     * @brief Constructor with five params
+     * @param A system matrix
+     * @param B input matrix
+     * @param c constant input
+     * @param C output matrix
+     * @param D throughput matrix
+     */
+    LinearSys(Matrix_t<Number>& A, Matrix_t<Number>& B, Matrix_t<Number>& c, Matrix_t<Number>& C, Matrix_t<Number>& D);
+
+    /**
+     * @brief Constructor with six params
+     * @param A system matrix
+     * @param B input matrix
+     * @param c constant input
+     * @param C output matrix
+     * @param D throughput matrix
+     * @param k output offset
+     */
+    LinearSys(Matrix_t<Number>& A, Matrix_t<Number>& B, Matrix_t<Number>& c, Matrix_t<Number>& C, Matrix_t<Number>& D, Matrix_t<Number>& k);
+
+    /**
+     * @brief Constructor with name and two params 
+     * @param name name of LinearSys
+     * @param A system matrix
+     * @param B input matrix
+     */
+    LinearSys(std::string name, Matrix_t<Number>& A, Matrix_t<Number>& B);
+
+    /**
+     * @brief Constructor with name and three params
+     * @param name name of LinearSys
+     * @param A system matrix
+     * @param B input matrix
+     * @param c constant input
+     */
+    LinearSys(std::string name, Matrix_t<Number>& A, Matrix_t<Number>& B, Matrix_t<Number>& c);
+
+    /**
+     * @brief Constructor with name and four params
+     * @param name name of LinearSys
+     * @param A system matrix
+     * @param B input matrix
+     * @param c constant input
+     * @param C output matrix
+     */
+    LinearSys(std::string name, Matrix_t<Number>& A, Matrix_t<Number>& B, Matrix_t<Number>& c, Matrix_t<Number>& C);
+
+    /**
+     * @brief Constructor with name and five params
+     * @param name name of LinearSys
+     * @param A system matrix
+     * @param B input matrix
+     * @param c constant input
+     * @param C output matrix
+     * @param D throughput matrix
+     */
+    LinearSys(std::string name, Matrix_t<Number>& A, Matrix_t<Number>& B, Matrix_t<Number>& c, Matrix_t<Number>& C, Matrix_t<Number>& D);
+
+    /**
+     * @brief Constructor with name and six params
+     * @param name name of LinearSys
+     * @param A system matrix
+     * @param B input matrix
+     * @param c constant input
+     * @param C output matrix
+     * @param D throughput matrix
+     * @param k output offset
+     */
+    LinearSys(std::string name, Matrix_t<Number>& A, Matrix_t<Number>& B, Matrix_t<Number>& c, Matrix_t<Number>& C, Matrix_t<Number>& D, Matrix_t<Number>& k);
+
+    /**
+     * @brief Copy Constructor - constructs a NonlinearSys from an existing one.
+     * @param other Another NonlinearSys, from which a new NonlinearSys is constructed
+     */
+    LinearSys(const LinearSys& other) = default;
 
     virtual ~LinearSys();
 
@@ -68,6 +178,32 @@ class LinearSys : private ContDynamics{
      * @return first reachable set
      */
     LinearReachableSet<Number> initReach(Zonotope<Number>& Rinit, ReachOptions<Number>& options);
+
+    /**
+     * @brief computes the reachable continuous set for the first time step using Krylov subspace methods
+     * @param Rinit initial reachable set
+     * @param options struct containing the algorithm settings
+     * @return first reachable set
+     */
+    LinearReachableSet<Number> initReach_Krylov(Zonotope<Number>& Rinit, ReachOptions<Number>& options);
+
+    /**
+     * @brief computes the reachable continuous set for the first time step in the untransformed space
+     * @param Rinit initial reachable set
+     * @param options struct containing the algorithm settings
+     * @return first reachable set
+     */
+    LinearReachableSet<Number> initReach_Euclidean(Zonotope<Number>& Rinit, ReachOptions<Number>& options);
+
+    /**
+     * @brief computes the solution due to the linearization error
+     * @param options struct containing the algorithm settings
+     * @param Vdyn set of admissible errors (dynamic)
+     * @param Vstat - set of admissible errors (static) (optional)
+     * @return  reachable set due to the linearization error
+     */
+    Zonotope<Number> error_solution(ReachOptions<Number>& options, Zonotope<Number> Vdyn, Zonotope<Number> Vstat);
+
 };
 
 /** @} */
