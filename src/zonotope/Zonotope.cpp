@@ -227,7 +227,46 @@ bool Zonotope<Number>::ChangeDimension(size_t new_dim){
  */
 template <typename Number>
 void Zonotope<Number>::Reduce(unsigned limitOrder){
-    
+    //std::cout << __func__ << ": Current order: " << this->order() << std::endl;
+	while ( this->order() > limitOrder ) {
+		Matrix_t<Number> generators = generators_;
+		Eigen::Index dim = generators_.rows();
+
+		// create duplicates of generators to sort them
+		std::vector<reachSolver::Vector_t<Number>> sortedGenerators;
+		for ( Eigen::Index i = 0; i < generators.cols(); i++ ) {
+			sortedGenerators.push_back( generators.col( i ) );
+		}
+
+		// Sort generators according to the difference between 1-norm and infty-norm
+		// (i.e.: How suitable are the generators to
+		// be overapproximated by an interval hull)
+		std::sort( sortedGenerators.begin(), sortedGenerators.end(), ZUtility::compareVectors<Number> );
+
+		// Row-wise sum of all 2*dim chosen generators (absolute value)
+		Vector_t<Number> sumVector = Vector_t<Number>::Zero( dim );
+		for ( unsigned i = 0; i < 2 * ( dim ); i++ ) {
+			sumVector += sortedGenerators[i].array().abs().matrix();
+		}
+
+		Eigen::Index numRemainingGenerators = Eigen::Index( sortedGenerators.size() - ( 2 * dim ) );
+
+		Matrix_t<Number> remainingGenerators = Matrix_t<Number>( dim, numRemainingGenerators );
+
+		// inserts the original remaining vectors
+		for ( Eigen::Index i = 0; i < numRemainingGenerators; i++ ) {
+			remainingGenerators.col( i ) = sortedGenerators[i + ( 2 * dim )];
+		}
+
+		// calculate interval hull of first 2n generators
+		Matrix_t<Number> intervalHull = sumVector.asDiagonal();
+
+		Matrix_t<Number> reducedGenerators = Matrix_t<Number>( dim, remainingGenerators.cols() + dim );
+
+		reducedGenerators << intervalHull, remainingGenerators;
+		generators_ = reducedGenerators;
+	}
+	//std::cout << __func__ << ": Reduced order: " << this->order() << std::endl;
 }
 
 /**
