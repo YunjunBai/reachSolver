@@ -15,6 +15,18 @@ namespace reachSolver{
 
 template class ContDynamics<double>;
 
+template <typename Number>
+ContDynamics<Number>::ContDynamics(std::string name){
+    name_ = name;
+}
+
+template <typename Number>
+ContDynamics<Number>::ContDynamics(std::string name, size_t dim, size_t num_inputs, size_t num_outputs){
+    name_ = name;
+    dim_ = dim;
+    num_inputs_ = num_inputs;
+    num_outputs_ = num_outputs;
+}
 
 template <typename Number>
 const std::string ContDynamics<Number>::name() const{
@@ -23,14 +35,23 @@ const std::string ContDynamics<Number>::name() const{
 
 template <typename Number>
 const size_t ContDynamics<Number>::num_states() const{
-    return num_states_;
+    return dim_;
 }
 
+template <typename Number>
+const size_t ContDynamics<Number>::dim() const{
+    return dim_;
+}
 
 template <typename Number>
 const size_t ContDynamics<Number>::num_inputs() const{
     return num_inputs_;
 }
 
+template <typename Number>
+Vector_t<Number> ContDynamics<Number>::abstrerr_lin(ReachOptions<Number>& options, Zonotope<Number> R, Zonotope<Number> VerrorDyn){
+    // compute interval of reachable set
+    
+}
 
 } //namespace reachSolver

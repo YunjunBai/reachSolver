@@ -14,11 +14,6 @@
 #include "ReachableSet.h"
 namespace reachSolver{
 
-struct Interval
-{
-    double interval[2];
-};
-
 /**
  * @class      TimePoint 
  * @brief      Class for TimePoint.

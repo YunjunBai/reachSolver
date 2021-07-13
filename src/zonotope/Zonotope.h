@@ -188,6 +188,28 @@ class Zonotope : private BasicObject {
     Zonotope Times(const Matrix_t<Number>& matrix) const;
 
     /**
+     * @brief implement the linear maps of a set, i.e., "*" operator
+     * @param matrix a matrix
+     * @return a  zonotope = matrix * this zonotope
+     */
+    Zonotope operator*(const Matrix_t<Number>& matrix) const;
+
+
+    /**
+     * @brief implement the times of zonotope and intervalmatrix
+     * @param int_matrix an IntervalMatrix
+     * @return a  zonotope = int_matrix * this zonotope
+     */
+    Zonotope Times(const IntervalMatrix int_matrix) const;
+
+    /**
+     * @brief implement the times of zonotope and intervalmatrix
+     * @param int_matrix an IntervalMatrix
+     * @return a  zonotope = int_matrix * this zonotope
+     */
+    Zonotope operator*(const IntervalMatrix int_matrix) const;
+
+    /**
      * @brief Get the minkowski addition of two zonotope,i.e., "+" operator
      * @param another_zonotope 
      * @return a  zonotope = zonotope1 + zonotope2
@@ -204,23 +226,32 @@ class Zonotope : private BasicObject {
     /**
      * @brief Get the minkowski addition of two zonotope,i.e., "+" operator
      * @param another_zonotope 
-     * @return True, if equal
+     * @return the sum
      */
     Zonotope operator+(const Zonotope<Number>& another_zonotope) const;
 
     /**
-     * @brief Get the minkowski addition of two zonotope,i.e., "+" operator
+     * @brief Get the addition of a zonotope and a vector
      * @param another_zonotope 
-     * @return True, if equal
+     * @return the sum
      */
-    Zonotope operator+(const Vector_t<Number>& vector);
+    Zonotope operator+(const Vector_t<Number>& vector) const;
 
     /**
      * @brief Get the enclosure for the convex hull of two zonotope
      * @param another_zonotope 
-     * @return a  zonotope enclosing the convex hull
+     * @return a zonotope enclosing the convex hull
      */
     Zonotope Convexhull(const Zonotope& another_zonotope) const;
+
+    /**
+     * @brief Generates a zonotope that encloses a zonotopes and its linear transformation
+     * @param another_zonotope second zonotope object, satisfying Z2 = (M * Z1) + Zplus
+     * @return zonotope, that encloses Z1 and Z2
+     */
+    Zonotope enclose(const Zonotope& another_zonotope) const;
+
+    
 };
 
 /** @} */

@@ -77,20 +77,20 @@ class NonlinearSys : private ContDynamics{
      * @brief Constructor with function handle to the dynamic equation
      * @param fun_handle function handle to the dynamic equation
      */
-    explicit NonlinearSys(function_type fun_handle);
+    // explicit NonlinearSys(function_type fun_handle);
 
     /**
      * @brief Constructor with two params
      * @param name name of dynamics
      * @param fun_handle function handle to the dynamic equation
      */
-    NonlinearSys(std::string name, function_type fun_handle);
+    // NonlinearSys(std::string name, function_type fun_handle);
 
     /**
      * @brief Constructor with three params
-     * @param fun_handle number of inputs
+     * @param fun_handle function handle to the dynamic equation
      * @param num_states number of states
-     * @param num_inputs function handle to the dynamic equation
+     * @param num_inputs number of inputs
      */
     NonlinearSys(function_type fun_handle, size_t num_states, size_t num_inputs);
 
@@ -99,7 +99,7 @@ class NonlinearSys : private ContDynamics{
      * @param name name of dynamics
      * @param fun_handle function handle to the dynamic equation
      * @param num_states number of states
-     * @param num_inputs function handle to the dynamic equation
+     * @param num_inputs number of inputs
      */
     NonlinearSys(std::string name, function_type fun_handle, size_t num_states, size_t num_inputs);
 
