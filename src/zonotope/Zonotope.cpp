@@ -344,6 +344,20 @@ Zonotope<Number> Zonotope<Number>::Convexhull(const Zonotope& another_zonotope) 
     
 }
 
+template <typename Number>
+IntervalMatrix Zonotope<Number>::interval() const{
+    Matrix_t<Number> Z << center_, generators_;
+    // determine left and right limit
+    Matrix_t<Number> delta = Eigen::Z.cwiseAbs().rowwise().sum()-Eigen::center_.cwiseAbs();
+    Matrix_t<Number> leftLimit = center_-delta;
+    Matrix_t<Number> rightLimit = center_+delta;
+
+    // instantiate interval
+    IntervalMatrix I;
+    I.inf = leftLimit;
+    I.sup = rightLimit;
+    return I;
+}
 
 } // namespace reachSolver
 

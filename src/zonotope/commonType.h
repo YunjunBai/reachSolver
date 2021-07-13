@@ -37,6 +37,18 @@ struct Interval
     double interval[2];
 };
 
+struct linerror_p_type
+{
+    Vector_t<double> u;
+    Vector_t<double> x;
+};
+
+struct linerror_type
+{
+    Vector_t<double> f0;
+    linerror_p_type p;
+};
+        
 enum class REACHABILITY_RESULT {
     SAFE,
     UNKNOWN

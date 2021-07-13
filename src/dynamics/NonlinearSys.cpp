@@ -461,6 +461,78 @@ int NonlinearSys<Number>::linReach(ReachOptions<Number>& options, ReachableSetEl
     return dimForSplit;
 } // linReach
 
+template <typename Number>
+Vector_t<Number> NonlinearSys<Number>::abstrerr_lin(ReachOptions<Number>& options, Zonotope<Number> R, Zonotope<Number> VerrorDyn){
+    Vector_t<Number> trueError;
+    // compute interval of reachable set
+    IntervalMatrix IHx = R.interval();
+    // compute intervals of total reachable set
+    IntervalMatrix totalInt_x;
+    totalInt_x.inf = IHx.inf+linerror_.p.x;
+    totalInt_x.sup = IHx.sup+linerror_.p.x;
+    
+    // compute intervals of input
+    IntervalMatrix IHu = options.U().interval();
+    // translate intervals by linearization point
+    IntervalMatrix totalInt_u;
+    totalInt_u.inf = IHu.inf+linerror_.p.u;
+    totalInt_u.sup = IHu.sup+linerror_.p.u;
+
+    if(options.tensor_order() == 2){
+        // obtain maximum absolute values within IHx, IHu
+        Matrix_t dx = IHx.inf.cwiseAbs().cwiseMax(IHx.sup.cwiseAbs());
+        Matrix_t du = IHu.inf.cwiseAbs().cwiseMax(IHu.sup.cwiseAbs());
+
+        // evaluate the hessian matrix with the selected range-bounding technique
+        std::vector<IntervalMatrix> H;
+        // if(options.lagrangeRem().method()!='interval'){
+
+        // }else{
+        //     if(name_ == "nonlinParamSys"){
+
+        //     }else{
+                H = hessian_(totalInt_x,totalInt_u);
+        //     }
+        // }
+
+        // calculate the Lagrange remainder (second-order error)
+        Vector_t<Number> errorLagr = Eigen::MatrixXd::Zero(H.size(),1)
+        Matrix_t dz << dx,
+                       du;
+        for (size_t i = 0; i < H.size(); i++)
+        {
+            Matrix_t<Number>  H__inf, H__sum, H_max;
+            H__inf = H[i].inf.cwiseAbs();
+            H__sum = H[i].sum.cwiseAbs();
+            H_max = H__inf.cwiseMax(H__sum);
+            errorLagr[i] = 0.5*dz.adjoint()*H_max*dz;
+        }
+        VerrorDyn = new Zonotope<Number>(0*errorLagr, errorLagr.asDiagonal());
+        trueError = errorLagr;
+        return trueError;
+    }else if(options.tensor_order() == 3){
+        // TODO not complete
+
+        // // obtain intervals and combined interval z
+        // std::vector<IntervalMatrix> dz = new std::vector<IntervalMatrix>(IHx, IHu);
+        // // reduce zonotope
+        // Zonotope<Number> Rred = R:
+        // Rred.Reduce(options.error_order());
+        // // combined zonotope (states + input)
+        // Z = cartProd(Rred,options.U);
+
+        // // calculate hessian matrix
+        // if (name_ == "nonlinParamSys"){
+        //     H = obj.hessian(obj.linError.p.x,obj.linError.p.u,options.paramInt);
+        // }else{
+        //     H = obj.hessian(obj.linError.p.x,obj.linError.p.u);
+        // }
+        
+        return trueError;
+    }else{
+        std::cout << "No abstraction error computation for chosen tensor order!" << std::endl;
+    }
+}
 
 } //namespace reachSolver
 
