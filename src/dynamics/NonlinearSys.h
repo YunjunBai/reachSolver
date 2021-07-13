@@ -26,16 +26,6 @@ template <typename Number>
 class NonlinearSys : private ContDynamics{
   private:
     typedef Vector_t<Number> (*function_type)(Vector_t<Number> param1, Number param2);
-    struct linerror_p_type
-    {
-        Vector_t<Number> u;
-        Vector_t<Number> x;
-    };
-    struct linerror_type
-    {
-        Vector_t<Number> f0;
-        linerror_p_type p;
-    };
      
     function_type mFile_;
     function_type jacobian_;
@@ -213,6 +203,15 @@ class NonlinearSys : private ContDynamics{
      * @return dimForSplit - dimension that is split to reduce the lin. error
      */
     int linReach(ReachOptions<Number>& options, ReachableSetElement<Number>& Rstart, ReachableSetElement<Number>& Rti, ReachableSetElement<Number>& Rtp);
+
+    /**
+     * @brief computes the solution due to the linearization error
+     * @param options - options struct
+     * @param R - reachable set (time-interval solution from linearized system + estimated set of abstraction errors)
+     * @param Verrordyn - abstraction error (zonotope)
+     * @return trueError - abstraction error (interval)
+     */
+    Vector_t<Number> abstrerr_lin(ReachOptions<Number>& options, Zonotope<Number> R, Zonotope<Number> VerrorDyn);
 
 };
 

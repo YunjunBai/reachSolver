@@ -103,15 +103,6 @@ class ContDynamics{
     *                                                                           *
     *****************************************************************************/
 
-    /**
-     * @brief computes the solution due to the linearization error
-     * @param options - options struct
-     * @param R - reachable set (time-interval solution from linearized system + estimated set of abstraction errors)
-     * @param Verrordyn - abstraction error (zonotope)
-     * @return trueError - abstraction error (interval)
-     */
-    Vector_t<Number> abstrerr_lin(ReachOptions<Number>& options, Zonotope<Number> R, Zonotope<Number> VerrorDyn);
-
 };
 
 /** @} */

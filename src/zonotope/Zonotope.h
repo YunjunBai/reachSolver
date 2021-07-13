@@ -251,6 +251,12 @@ class Zonotope : private BasicObject {
      */
     Zonotope enclose(const Zonotope& another_zonotope) const;
 
+    /**
+     * @brief Overapproximates a zonotope by an interval hull
+     * @return interval object
+     */
+    IntervalMatrix interval() const;
+
     
 };
 

@@ -48,10 +48,5 @@ const size_t ContDynamics<Number>::num_inputs() const{
     return num_inputs_;
 }
 
-template <typename Number>
-Vector_t<Number> ContDynamics<Number>::abstrerr_lin(ReachOptions<Number>& options, Zonotope<Number> R, Zonotope<Number> VerrorDyn){
-    // compute interval of reachable set
-    
-}
 
 } //namespace reachSolver
