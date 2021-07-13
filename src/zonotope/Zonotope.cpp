@@ -271,6 +271,34 @@ Zonotope<Number> Zonotope<Number>::Times(const Matrix_t<Number>& matrix) const{
     return result;
 }
 
+template <typename Number>
+Zonotope<Number> Zonotope<Number>::operator*(const Matrix_t<Number>& matrix) const{
+    return Times(matrix);
+}
+
+template <typename Number>
+Zonotope<Number> Zonotope<Number>::Times(const IntervalMatrix int_matrix) const{
+    Matrix_t<Number> M_min = int_matrix.inf;
+    Matrix_t<Number> M_max = int_matrix.sup;
+    Zonotope<Number> result;
+    // get center of interval matrix
+    Matrix_t<Number> T = 0.5*(M_max+M_min);
+    // get symmetric interval matrix
+    Matrix_t<Number> S = 0.5*(M_max-M_min);
+    Matrix_t<Number> Z << center_, generators_;
+    Matrix_t<Number> Zabssum = Eigen::Z.cwiseAbs().rowwise().sum();
+    // compute new zonotope
+    Zonotope<Number> result;
+    result.set_center(T*Z);
+    result.set_generators(Eigen::(S*Zabssum).diagonal());
+    return result;
+}
+
+template <typename Number>
+Zonotope<Number> Zonotope<Number>::operator*(const IntervalMatrix int_matrix) const{
+    return Times(int_matrix);
+}
+
 /**
  * @brief Get the minkowski addition of two zonotope,i.e., "+" operator
  * @param another_zonotope 
@@ -289,6 +317,21 @@ Zonotope<Number> Zonotope<Number>::Plus(const Zonotope& another_zonotope) const{
     sum.DeleteZeroGenerators();
     //sum.reduce();
     return sum;
+}
+
+template <typename Number>
+Zonotope<Number> Zonotope<Number>::operator+(const Zonotope& another_zonotope) const{
+    return Plus(another_zonotope);
+}
+
+template <typename Number>
+Zonotope<Number> Zonotope<Number>::Plus(const Vector_t<Number>& vector) const{
+    return new Zonotope<Number>();
+}
+
+template <typename Number>
+Zonotope<Number> Zonotope<Number>::operator+(const Vector_t<Number>& vector) const{
+    return Plus(vector);
 }
 
 /**

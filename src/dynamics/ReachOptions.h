@@ -28,15 +28,19 @@ class ReachOptions{
     double tFinal_;
     Zonotope<Number> R0_;
     Zonotope<Number> U_;
-    Vector_t<Number> uTrans_;
-    Vector_t<Number> Rtrans_;
+    Zonotope<Number> uTrans_;
+    Zonotope<Number> Rtrans_;
+    Zonotope<Number> Rhom_;
+    Zonotope<Number> Rhom_tp_;
+    Zonotope<Number> Raux_;
+    Zonotope<Number> Rpar_;
 
     double time_step_;
-    int taylor_terms_;
-    int zonotope_order_;
-    int intermediate_order_;
-    int error_order_;
-    int tensor_order_;
+    size_t taylor_terms_;
+    size_t zonotope_order_;
+    size_t intermediate_order_;
+    size_t error_order_;
+    size_t tensor_order_;
 
     Number *factor_;
 
@@ -140,61 +144,61 @@ class ReachOptions{
      * @brief Get the taylor_terms
      * @return the taylor_terms
      */
-    const int taylor_terms() const;
+    const size_t taylor_terms() const;
 
     /**
      * @brief Replaces the taylor_terms with the parameter
      * @param taylor_terms
      */
-    void set_taylor_terms(int taylor_terms);
+    void set_taylor_terms(size_t taylor_terms);
     
     /**
      * @brief Get the zonotope_order
      * @return the zonotope_order
      */
-    const int zonotope_order() const;
+    const size_t zonotope_order() const;
 
     /**
      * @brief Replaces the zonotope_order with the parameter
      * @param zonotope_order
      */
-    void set_zonotope_order(int zonotope_order);
+    void set_zonotope_order(size_t zonotope_order);
     
     /**
      * @brief Get the intermediate_order
      * @return the intermediate_order
      */
-    const int intermediate_order() const;
+    const size_t intermediate_order() const;
 
     /**
      * @brief Replaces the intermediate_order with the parameter
      * @param intermediate_order
      */
-    void set_intermediate_order(int intermediate_order);
+    void set_intermediate_order(size_t intermediate_order);
     
     /**
      * @brief Get the error_order
      * @return the error_order
      */
-    const int error_order() const;
+    const size_t error_order() const;
 
     /**
      * @brief Replaces the error_order with the parameter
      * @param error_order
      */
-    void set_error_order(int error_order);
+    void set_error_order(size_t error_order);
     
     /**
      * @brief Get the tensor_order
      * @return the tensor_order
      */
-    const int tensor_order() const;
+    const size_t tensor_order() const;
 
     /**
      * @brief Replaces the tensor_order with the parameter
      * @param tensor_order
      */
-    void set_tensor_order(int tensor_order);
+    void set_tensor_order(size_t tensor_order);
 
     /**
    * @brief Get the factor
@@ -248,14 +252,74 @@ class ReachOptions{
      * @brief Get the uTrans
      * @return the uTrans
      */
-    const Vector_t<Number> uTrans() const;
+    const Zonotope<Number> uTrans() const;
 
     /**
      * @brief Replaces the max_error with the parameter
-     * @param max_error
+     * @param uTrans
      */
-    void set_uTrans(Vector_t<Number> uTrans);
+    void set_uTrans(Zonotope<Number> uTrans);
 
+    /** 
+     * @brief Get the Rhom
+     * @return the Rhom
+     */
+    const Zonotope<Number> Rhom() const;
+
+    /**
+     * @brief Replaces the Rhom with the parameter
+     * @param Rhom
+     */
+    void set_Rhom(Zonotope<Number> Rhom);
+    
+    /** 
+     * @brief Get the uTrans
+     * @return the uTrans
+     */
+    const Zonotope<Number> Rhom_tp() const;
+
+    /**
+     * @brief Replaces the Rhom_tp with the parameter
+     * @param Rhom_tp
+     */
+    void set_Rhom_tp(Zonotope<Number> Rhom_tp);
+    
+    /** 
+     * @brief Get the Raux
+     * @return the Raux
+     */
+    const Zonotope<Number> Raux() const;
+
+    /**
+     * @brief Replaces the Raux with the parameter
+     * @param Raux
+     */
+    void set_Raux(Zonotope<Number> Raux);
+
+    /** 
+     * @brief Get the Rpar
+     * @return the Rpar
+     */
+    const Zonotope<Number> Rpar() const;
+
+    /**
+     * @brief Replaces the Rpar with the parameter
+     * @param Rpar
+     */
+    void set_Rpar(Zonotope<Number> Rpar);
+
+    /** 
+     * @brief Get the Rtrans
+     * @return the Rtrans
+     */
+    const Zonotope<Number> RpRtransar() const;
+
+    /**
+     * @brief Replaces the Rtrans with the parameter
+     * @param Rtrans
+     */
+    void set_Rtrans(Zonotope<Number> Rtrans);
+    
     /**
      * @brief Get the originContained
      * @return the originContained

@@ -26,6 +26,17 @@ using Matrix_t = Eigen::Matrix<Number, Eigen::Dynamic, Eigen::Dynamic>;
 template <typename Number>
 using Vector_set_t = std::set<Vector_t<Number>>;
 
+struct IntervalMatrix
+{
+    Matrix_t<double> inf;
+    Matrix_t<double> sup;
+};
+
+struct Interval
+{
+    double interval[2];
+};
+
 enum class REACHABILITY_RESULT {
     SAFE,
     UNKNOWN

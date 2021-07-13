@@ -29,10 +29,15 @@ class LinearSys : private ContDynamics{
     {
         double timeStep;
         Matrix_t<Number> eAt;
-        Number F;
-        Number RV;
-        Number inputCorr;
-        Number Rtrans;
+        IntervalMatrix F;
+        Zonotope<Number> RV;
+        Zonotope<Number> inputCorr;
+        Zonotope<Number> Rtrans;
+        std::vector<Matrix_t<Number>> powers;
+        IntervalMatrix error;
+        IntervalMatrix inputF;
+        Zonotope<Number> V;
+        IntervalMatrix eAtInt;
     };
     Matrix_t<Number> A_; //system matrix
     Matrix_t<Number> B_; //input matrix
@@ -42,6 +47,31 @@ class LinearSys : private ContDynamics{
     Matrix_t<Number> k_; //output offset
     taylor_type taylor_; 
     Matrix_t<Number> krylov_; 
+
+    /**
+     * @brief computes the overapproximation of the exponential of a system matrix up to a certain accuracy
+     * @param options struct containing the algorithm settings
+     */
+    void exponential(ReachOptions<Number>& options);
+
+    /**
+     * @brief tie=time interval error; computes the error done by building the convex hull of time point solutions
+     * @param options struct containing the algorithm settings
+     */
+    void tie(ReachOptions<Number>& options);
+
+    /**
+     * @brief computes the bloating due to the input 
+     * @param options struct containing the algorithm settings
+     */
+    void inputSolution(ReachOptions<Number>& options);
+
+    /**
+     * @brief computes the error done by the linear assumption of the constant input solution
+     * @param options struct containing the algorithm settings
+     */
+    void inputTie(ReachOptions<Number>& options);
+
 
   public:
     /****************************************************************************
@@ -202,7 +232,7 @@ class LinearSys : private ContDynamics{
      * @param Vstat - set of admissible errors (static) (optional)
      * @return  reachable set due to the linearization error
      */
-    Zonotope<Number> error_solution(ReachOptions<Number>& options, Zonotope<Number> Vdyn, Zonotope<Number> Vstat);
+    Zonotope<Number> error_solution(ReachOptions<Number>& options, Zonotope<Number>& Vdyn, Zonotope<Number>& Vstat);
 
 };
 

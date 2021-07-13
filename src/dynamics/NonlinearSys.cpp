@@ -20,42 +20,38 @@ template class NonlinearSys<double>;
 *                           Constructors and Destructors                    *
 *                                                                           *
 *****************************************************************************/
-template <typename Number>
-NonlinearSys<Number>::NonlinearSys(function_type fun_handle):
-    mFile_(fun_handle),
-    name_("nonlinearSys"){
-    std::vector<size_t> tmp_obj = numberOfInputs(fun_handle, 2);
-    num_states_ = tmp_obj[0];
-    num_inputs_ = tmp_obj[1];   
-    assert(fun_handle!=NULL);
-}
+// template <typename Number>
+// NonlinearSys<Number>::NonlinearSys(function_type fun_handle)
+//     :ContDynamics(new String("nonlinearSys"), 10, 1, 1)
+//     :mFile_(fun_handle){
+//     std::vector<size_t> tmp_obj = numberOfInputs(fun_handle, 2);
+//     num_states_ = tmp_obj[0];
+//     num_inputs_ = tmp_obj[1];   
+//     assert(fun_handle!=NULL);
+// }
+
+// template <typename Number>
+// NonlinearSys<Number>::NonlinearSys(std::string name, function_type fun_handle):
+//     mFile_(fun_handle),
+//     name_(name){
+//     std::vector<size_t> tmp_obj = numberOfInputs(fun_handle, 2);
+//     num_states_ = tmp_obj[0];
+//     num_inputs_ = tmp_obj[1];   
+//     assert(fun_handle!=NULL);
+// }
 
 template <typename Number>
-NonlinearSys<Number>::NonlinearSys(std::string name, function_type fun_handle):
-    mFile_(fun_handle),
-    name_(name){
-    std::vector<size_t> tmp_obj = numberOfInputs(fun_handle, 2);
-    num_states_ = tmp_obj[0];
-    num_inputs_ = tmp_obj[1];   
-    assert(fun_handle!=NULL);
-}
-
-template <typename Number>
-NonlinearSys<Number>::NonlinearSys(function_type fun_handle, size_t num_states, size_t num_inputs):
-    mFile_(fun_handle),
-    name_("nonlinearSys"),
-    num_states_(num_states),
-    num_inputs_(num_inputs){ 
+NonlinearSys<Number>::NonlinearSys(function_type fun_handle, size_t num_states, size_t num_inputs)
+    :ContDynamics(new String("nonlinearSys"), num_states, num_inputs, 1)
+    :mFile_(fun_handle){ 
     assert(fun_handle!=NULL);
    
 }
 
 template <typename Number>
-NonlinearSys<Number>::NonlinearSys(std::string name, function_type fun_handle, size_t num_states, size_t num_inputs):
-    mFile_(fun_handle),
-    name_(name),
-    num_states_(num_states),
-    num_inputs_(num_inputs){
+NonlinearSys<Number>::NonlinearSys(std::string name, function_type fun_handle, size_t num_states, size_t num_inputs)
+    :ContDynamics(name, num_states, num_inputs, 1)
+    :mFile_(fun_handle){
     assert(fun_handle!=NULL);
    
 }
@@ -420,9 +416,9 @@ int NonlinearSys<Number>::linReach(ReachOptions<Number>& options, ReachableSetEl
                 // compute overall reachable set including linearization error
                 Zonotope<Number> Rmax = Rti_internal + RallError;
                 // compute linearization error
-                VerrorDyn = Zonotope<Number>();
+                VerrorDyn = new Zonotope<Number>();
                 trueError = abstrerr_lin(options, Rmax, VerrorDyn);
-                VerrorStat = Zonotope<Number>();
+                VerrorStat = new Zonotope<Number>();
             // }else{
             //     // compute overall reachable set including linearization error
             //     Zonotope<Number> Rmax = Rdelta + RallError;

@@ -44,7 +44,7 @@ class ContDynamics{
     //typedef Number (*function_type)(Number param1, Number param2);
 
     std::string name_;
-    size_t num_states_;
+    size_t dim_;
     size_t num_inputs_;
     size_t num_outputs_;
 
@@ -66,9 +66,24 @@ class ContDynamics{
     /**
      * @brief Constructor with no params
      */
-    ContDynamics();
+    // ContDynamics();
 
-    virtual ~NonlinearSys();
+    /**
+     * @brief Constructor with function handle to the dynamic equation
+     * @param name name of dynamics
+     */
+    explicit ContDynamics(std::string name);
+
+    /**
+     * @brief Constructor with four params
+     * @param name name of dynamics
+     * @param dim number of states
+     * @param num_inputs number of inputs
+     * @param num_outputs number of outputs
+     */
+    ContDynamics(std::string name, size_t dim, size_t num_inputs, size_t num_outputs);
+
+    virtual ~ContDynamics();
 
     /*****************************************************************************
     *                                                                           *
@@ -78,6 +93,7 @@ class ContDynamics{
     const std::string name() const;
 
     const size_t num_states() const;
+    const size_t dim() const;
 
     const size_t num_inputs() const;
 
@@ -94,7 +110,7 @@ class ContDynamics{
      * @param Verrordyn - abstraction error (zonotope)
      * @return trueError - abstraction error (interval)
      */
-    Vector_t<Number> abstrerr_lin(ReachOptions<Number>& options, Zonotope<Number> R);
+    Vector_t<Number> abstrerr_lin(ReachOptions<Number>& options, Zonotope<Number> R, Zonotope<Number> VerrorDyn);
 
 };
 
