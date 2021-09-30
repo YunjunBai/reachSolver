@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "BasicObject.h"
+#include "zonotope/BasicObject.h"
 #include <vector> 
 #include <string>
 #include <cmath>
@@ -19,7 +19,7 @@
 #include <float.h>
 #include "ReachOptions.h"
 #include "ReachableSet.h"
-#include "ReachSpecification.h"
+// #include "ReachSpecification.h"
 #include "TimeRelated.h"
 
 namespace reachSolver{

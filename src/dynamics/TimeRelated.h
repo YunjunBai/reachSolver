@@ -9,8 +9,8 @@
 
 #pragma once
 
-#include "BasicObject.h"
-#include "Zonotope.h"
+#include "zonotope/BasicObject.h"
+#include "zonotope/Zonotope.h"
 #include "ReachableSet.h"
 namespace reachSolver{
 
@@ -58,7 +58,7 @@ class TimePoint{
      * @brief Replaces the current set with the parameter
      * @param set
      */
-    void set_rs(int i, ReachableSetElement<Number>& set);
+    void set_rs(int i, std::vector<ReachableSetElement<Number>> set);
 
     /**
      * @brief Get the time
@@ -118,7 +118,7 @@ class TimeInt{
      * @brief Replaces the current set with the parameter
      * @param set
      */
-    void set_rs(int i, std::vector<ReachableSetElement<Number>>& set);
+    void set_rs(int i, std::vector<ReachableSetElement<Number>> set);
 
     /**
      * @brief Get the time
@@ -130,7 +130,7 @@ class TimeInt{
      * @brief Replaces the current time with the parameter
      * @param time
      */
-    void set_time(int i, double time_start, double time_end);
+    void set_time(int i, Interval time);
 };
 /** @} */
 

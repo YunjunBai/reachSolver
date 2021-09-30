@@ -22,7 +22,7 @@ namespace reachSolver{
  * @{
  */
 template <typename Number>
-class LinearSys : private ContDynamics{
+class LinearSys : private ContDynamics<Number>{
   private:
 
     struct taylor_type
@@ -83,7 +83,7 @@ class LinearSys : private ContDynamics{
     /**
      * @brief Constructor with no params
      */
-    LinearSys();
+    //LinearSys();
 
     /**
      * @brief Constructor with two params
@@ -232,7 +232,7 @@ class LinearSys : private ContDynamics{
      * @param Vstat - set of admissible errors (static) (optional)
      * @return  reachable set due to the linearization error
      */
-    Zonotope<Number> error_solution(ReachOptions<Number>& options, Zonotope<Number>& Vdyn, Zonotope<Number>& Vstat);
+    Zonotope<Number> error_solution(ReachOptions<Number>& options, Zonotope<Number> Vdyn, Zonotope<Number> Vstat);
 
 };
 

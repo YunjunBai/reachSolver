@@ -1,6 +1,6 @@
 /**
- * @file   ReachableOptions.h
- * @brief  ReachableOptions class representation
+ * @file   ReachOptions.h
+ * @brief  ReachOptions class representation
  * @author Yunjun Bai
  * @date April 2021
  * @version 1.0 
@@ -9,8 +9,8 @@
 
 #pragma once
 
-#include "BasicObject.h"
-#include "Zonotope.h"
+#include "zonotope/BasicObject.h"
+#include "zonotope/Zonotope.h"
 namespace reachSolver{
 
 /**
@@ -28,7 +28,8 @@ class ReachOptions{
     double tFinal_;
     Zonotope<Number> R0_;
     Zonotope<Number> U_;
-    Zonotope<Number> uTrans_;
+    Zonotope<Number> uTrans_lin_;
+    Number uTrans_nonlin_;
     Zonotope<Number> Rtrans_;
     Zonotope<Number> Rhom_;
     Zonotope<Number> Rhom_tp_;
@@ -48,6 +49,9 @@ class ReachOptions{
     std::string alg_;
     int max_error_;
     int originContained_;
+
+    int reductionInterval_;
+    int usekrylovError_;
 
   public:
     /*****************************************************************************
@@ -201,15 +205,15 @@ class ReachOptions{
     void set_tensor_order(size_t tensor_order);
 
     /**
-   * @brief Get the factor
-   * @return the factor
-   */
-    const Number* factor() const;
+     * @brief Get the factor
+     * @return the factor
+     */
+    Number* factor() const;
 
     /**
-   * @brief Replaces the factor with the parameter
-   * @param factor
-   */
+     * @brief Replaces the factor with the parameter
+     * @param factor
+     */
     void set_factor(Number* factor);
 
     /**
@@ -252,13 +256,25 @@ class ReachOptions{
      * @brief Get the uTrans
      * @return the uTrans
      */
-    const Zonotope<Number> uTrans() const;
+    const Zonotope<Number> uTrans_lin() const;
 
     /**
-     * @brief Replaces the max_error with the parameter
+     * @brief Replaces the uTrans with the parameter
      * @param uTrans
      */
-    void set_uTrans(Zonotope<Number> uTrans);
+    void set_uTrans_lin(Zonotope<Number> uTrans_lin);
+  
+    /** 
+     * @brief Get the uTrans
+     * @return the uTrans
+     */
+    const Number uTrans_nonlin() const;
+
+    /**
+     * @brief Replaces the uTrans with the parameter
+     * @param uTrans
+     */
+    void set_uTrans_nonlin(Number uTrans_nonlin);
 
     /** 
      * @brief Get the Rhom
@@ -273,8 +289,8 @@ class ReachOptions{
     void set_Rhom(Zonotope<Number> Rhom);
     
     /** 
-     * @brief Get the uTrans
-     * @return the uTrans
+     * @brief Get the Rhom_tp
+     * @return the Rhom_tp
      */
     const Zonotope<Number> Rhom_tp() const;
 
@@ -312,7 +328,7 @@ class ReachOptions{
      * @brief Get the Rtrans
      * @return the Rtrans
      */
-    const Zonotope<Number> RpRtransar() const;
+    const Zonotope<Number> Rtrans() const;
 
     /**
      * @brief Replaces the Rtrans with the parameter
@@ -332,6 +348,30 @@ class ReachOptions{
      */
     void set_originContained(int originContained);
 
+    /**
+     * @brief Get the reductionInterval
+     * @return the reductionInterval
+     */
+    const int reductionInterval() const;
+
+    /**
+     * @brief Replaces the reductionInterval with the parameter
+     * @param reductionInterval
+     */
+    void set_reductionInterval(int reductionInterval);
+
+    /**
+     * @brief Get the usekrylovError
+     * @return the usekrylovError
+     */
+    const int usekrylovError() const;
+
+    /**
+     * @brief Replaces the usekrylovError with the parameter
+     * @param usekrylovError
+     */
+    void set_usekrylovError(int usekrylovError);
+    
 };
 /** @} */
 }

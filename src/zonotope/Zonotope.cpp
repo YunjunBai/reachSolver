@@ -38,6 +38,13 @@ Zonotope<Number>::Zonotope(size_t dimension):
     assert(dimension!=0);
 }
 
+template <typename Number>
+Zonotope<Number>::Zonotope(IntervalMatrix interval_m){
+    center_ = 0.5*(interval_m.inf + interval_m.sup);
+    generators_ =  (0.5*(interval_m.sup - interval_m.inf)).diagonal();
+    dimension_ = center.rows();
+}
+
 /**
  * @brief Constructor with center and generators.
  * @param center A  vector
@@ -295,6 +302,15 @@ void Zonotope<Number>::Display() const{
 *                                                                           *
 *****************************************************************************/
 
+template <typename Number>
+Zonotope<Number> Zonotope<Number>::operator*(Number num) const{
+    Zonotope<Number> result;
+    result.set_center(num * center_ );
+    result.set_generators(num * generators_);
+    return result;
+}
+
+
 /**
  * @brief implement the linear maps of a set, i.e., "*" operator
  * @param matrix a matrix
@@ -372,6 +388,27 @@ template <typename Number>
 Zonotope<Number> Zonotope<Number>::operator+(const Vector_t<Number>& vector) const{
     return Plus(vector);
 }
+
+template <typename Number>
+Zonotope<Number> Zonotope<Number>::operator+(const Number num) const{
+    return new Zonotope<Number>();
+}
+
+template <typename Number>
+Zonotope<Number> Zonotope<Number>::operator-(const Number num) const{
+    return new Zonotope<Number>();
+}
+
+template <typename Number>
+Zonotope<Number> Zonotope<Number>::operator-(const Vector_t<Number>& vector) const{
+    return new Zonotope<Number>();
+}
+// template <typename Number>
+// Zonotope<Number> Zonotope<Number>::operator&(const Zonotope& another_zonotope) const{
+//     // convert sets to constrained zonotopes
+
+//     return Plus(vector);
+// }
 
 /**
  * @brief Get the enclosure for the convex hull of two zonotope

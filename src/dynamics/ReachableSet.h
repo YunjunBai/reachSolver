@@ -9,9 +9,9 @@
 
 #pragma once
 
-#include "BasicObject.h"
+#include "zonotope/BasicObject.h"
 //#include "TimeRelated.h"
-#include "Zonotope.h"
+#include "zonotope/Zonotope.h"
 namespace reachSolver{
 
 /**
@@ -44,7 +44,7 @@ class ReachableSetElement{
      * @param set Zonotope<Number>
      * @param error error vector
      */
-    ReachableSetElement(Zonotope<Number> set, std::vector<Number> error);
+    ReachableSetElement(Zonotope<Number> set, Vector_t<Number> error);
 
     /*****************************************************************************
     *                                                                           *
@@ -52,28 +52,28 @@ class ReachableSetElement{
     *                                                                           *
     *****************************************************************************/
     /**
-     * @brief Get the set(i)
+     * @brief Get the set
      * @return the set
      */
-    const Zonotope<Number> rs() const;
+    Zonotope<Number> rs() const;
 
     /**
      * @brief Replaces the current set with the parameter
      * @param set
      */
-    void set_rs(Zonotope<NumberType>& set);
+    void set_rs(Zonotope<Number>& set);
 
     /**
      * @brief Get the error
      * @return the error
      */
-    const std::vector<Number> error() const;
+    Vector_t<Number> error() const;
 
     /**
      * @brief Replaces the current error with the parameter
      * @param time
      */
-    void set_error(std::vector<Number> error);
+    void set_error(Vector_t<Number>& error);
 
     /**
      * @brief Get the prev
@@ -115,6 +115,8 @@ class ReachableSet{
     std::vector<ReachableSetElement<Number>> R0_;
     int parent_rs_; //index of parent reachable set
     int loc_; //index of the location
+
+    int internalCount_;
 
   public:
     /****************************************************************************
@@ -230,10 +232,34 @@ class ReachableSet{
     const int parent_rs() const;
 
     /**
+     * @brief Replaces the current parent_rs with the parameter
+     * @param parent_rs
+     */
+    void set_parent_rs(int parent_rs);
+
+    /**
      * @brief Get the loc
      * @return loc
      */
     const int loc() const;
+
+    /**
+     * @brief Replaces the current loc with the parameter
+     * @param loc
+     */
+    void set_loc(int loc);
+
+    /**
+     * @brief Get the internalCount
+     * @return internalCount
+     */
+    const int internalCount() const;
+
+    /**
+     * @brief Replaces the current internalCount with the parameter
+     * @param internalCount
+     */
+    void set_internalCount(int internalCount);
 
     /*****************************************************************************
     *                                                                           *
@@ -247,7 +273,8 @@ class ReachableSet{
      * @param options options for the computation of the reachable set
      * @return R - reachable sets
      */
-    ReachableSet<Number> deleteRedundantSets(ReachableSet<Number> Rold, ReachSpecification& options);
+    // ReachableSet<Number> deleteRedundantSets(ReachableSet<Number> Rold, ReachSpecification& options);
+    ReachableSet<Number> deleteRedundantSets(ReachableSet<Number> Rold, ReachOptions<Number>& options);
 };
 /** @} */
 
@@ -285,7 +312,7 @@ class LinearReachableSet{
      * @brief Copy Constructor - constructs a ReachableSet from an existing one.
      * @param other Another ReachableSet, from which a new ReachableSet is constructed
      */
-    LinearReachableSet(const ReachableSet<Number>& other) = default;
+    LinearReachableSet(const LinearReachableSet<Number>& other) = default;
 
     virtual ~LinearReachableSet();
 
@@ -312,7 +339,7 @@ class LinearReachableSet{
      * @brief Get the time_interval
      * @return time_interval
      */
-    const std::vector<Zonotope<Number> > time_interval() const;
+    const Zonotope<Number> time_interval() const;
 
     /**
      * @brief Replaces the current time_interval with the parameter

@@ -23,7 +23,7 @@ namespace reachSolver{
  * @{
  */
 template <typename Number>
-class NonlinearSys : private ContDynamics{
+class NonlinearSys : private ContDynamics<Number>{
   private:
     typedef Vector_t<Number> (*function_type)(Vector_t<Number> param1, Number param2);
      
@@ -38,18 +38,19 @@ class NonlinearSys : private ContDynamics{
     // used in constructor
     std::vector<size_t> numberOfInputs(function_type fun_handle, size_t inpArgs);
 
-    // used in reach
+    // used in reach: create an object of class reachSet that stores the reachable set
     ReachableSet<Number> createReachSetObject(TimeInt<Number>& time_int, TimePoint<Number>& time_point);
 
     // used in initReach
     ReachableSet<Number> initReach_linRem(std::vector<ReachableSetElement<Number>>& Rinit, ReachOptions<Number>& options);
 
+    // Splits a zonotope bundle into two zonotope bundles. This is done for one or every generator resulting in n possible splits where n is the system dimension; it is also possible to use a splitting hyperplane
     std::vector<Zonotope<Number>> split(Zonotope<Number> input, int number);
 
     // used in linReach
     LinearSys<Number> linearize(ReachOptions<Number>& options, Zonotope<Number>& R, ReachOptions<Number>& linOptions);
 
-    double linReach_linRem(ReachableSet<Number>& R, Zonotope<Number>& Rinit, Zonotope<Number>& Rdelta, ReachOptions<Number>& options, ReachableSetElement<Number>& Rti, ReachableSetElement<Number>& Rtp);
+    double linReach_linRem(LinearReachableSet<Number>& R, Zonotope<Number>& Rinit, Zonotope<Number>& Rdelta, ReachOptions<Number>& options, Zonotope<Number>& Rti, Zonotope<Number>& Rtp);
 
   public:
     /****************************************************************************
@@ -162,7 +163,8 @@ class NonlinearSys : private ContDynamics{
      * @param R object of class reachSet storing the computed reachable set
      * @return 1 if specifications are satisfied, 0 if not
      */
-    int reach(ReachOptions<Number>& options, ReachSpecification& spec, ReachableSet<Number> & R);
+    // int reach(ReachOptions<Number>& options, ReachSpecification& spec, ReachableSet<Number> & R);
+    int reach(ReachOptions<Number>& options, ReachableSet<Number> & R);
 
     /**
      * @brief checks if all necessary options are there and have valid values
@@ -184,7 +186,7 @@ class NonlinearSys : private ContDynamics{
      * @param options struct containing the algorithm settings
      * @return first reachable set
      */
-    ReachableSet<Number> initReach(std::vector<ReachableSetElement<Number>>& Rinit, ReachOptions<Number>& options);
+    ReachableSet<Number> initReach(std::vector<ReachableSetElement<Number>> Rinit, ReachOptions<Number>& options);
 
     /**
      * @brief computes the reachable continuous set for one time step of a nonlinear system by overapproximative linearization

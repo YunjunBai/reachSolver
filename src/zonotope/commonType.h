@@ -39,8 +39,8 @@ struct Interval
 
 struct linerror_p_type
 {
-    Vector_t<double> u;
     Vector_t<double> x;
+    double u;
 };
 
 struct linerror_type

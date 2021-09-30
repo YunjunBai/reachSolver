@@ -53,6 +53,12 @@ class Zonotope : private BasicObject {
     explicit Zonotope(size_t dimension);
 
     /**
+     * @brief Constructor with interval_m
+     * @param interval_m IntervalMatrix
+     */
+    explicit Zonotope(IntervalMatrix interval_m);
+
+    /**
      * @brief Constructor with center and generators.
      * @param center A vector 
      * @param generators A  matrix
@@ -183,6 +189,13 @@ class Zonotope : private BasicObject {
     /**
      * @brief implement the linear maps of a set, i.e., "*" operator
      * @param matrix a matrix
+     * @return a  zonotope = num * this zonotope
+     */
+    Zonotope operator*(Number num) const;
+
+    /**
+     * @brief implement the linear maps of a set, i.e., "*" operator
+     * @param matrix a matrix
      * @return a  zonotope = matrix * this zonotope
      */
     Zonotope Times(const Matrix_t<Number>& matrix) const;
@@ -232,10 +245,39 @@ class Zonotope : private BasicObject {
 
     /**
      * @brief Get the addition of a zonotope and a vector
-     * @param another_zonotope 
+     * @param vector 
      * @return the sum
      */
     Zonotope operator+(const Vector_t<Number>& vector) const;
+
+    /**
+     * @brief Get the addition of a zonotope and a vector
+     * @param vector 
+     * @return the sum
+     */
+    Zonotope operator+(const Number num) const;
+
+
+    /**
+     * @brief Get the addition of a zonotope and a vector
+     * @param vector 
+     * @return the sum
+     */
+    Zonotope operator-(const Number num) const;
+
+
+    /**
+     * @brief Get the addition of a zonotope and a vector
+     * @param vector 
+     * @return the sum
+     */
+    Zonotope operator-(const Vector_t<Number>& vector) const;
+    // /**
+    //  * @brief overloads & operator, computes the intersection of two zonotopes
+    //  * @param another_zonotope 
+    //  * @return the and
+    //  */
+    // Zonotope operator&(const Zonotope<Number>& another_zonotope) const;
 
     /**
      * @brief Get the enclosure for the convex hull of two zonotope

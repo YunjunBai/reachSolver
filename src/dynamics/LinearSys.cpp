@@ -13,14 +13,83 @@
 
 namespace reachSolver{
 
+template class LinearSys<double>;
+
 /*****************************************************************************
 *                                                                           *
 *                           Constructors and Destructors                    *
 *                                                                           *
 *****************************************************************************/
 template <typename Number>
-LinearSys<Number>::LinearSys(){
+LinearSys<Number>::LinearSys(Matrix_t<Number>& A, Matrix_t<Number>& B)
+    :ContDynamics<Number>(std::string("linearSys"), A.rows(), B.cols(), 1),
+    A_(A), B_(B), c_(0, 0), C_(Eigen::MatrixXd::Identity(1,1)), D_(0, 0), k_(0, 0){ 
+   
 }
+
+template <typename Number>
+LinearSys<Number>::LinearSys(Matrix_t<Number>& A, Matrix_t<Number>& B, Matrix_t<Number>& c)
+    :ContDynamics<Number>(std::string("linearSys"), A.rows(), B.cols(), 1),
+    A_(A), B_(B), c_(c), C_(Eigen::MatrixXd::Identity(1,1)), D_(0, 0), k_(0, 0){ 
+   
+}
+
+template <typename Number>
+LinearSys<Number>::LinearSys(Matrix_t<Number>& A, Matrix_t<Number>& B, Matrix_t<Number>& c, Matrix_t<Number>& C)
+    :ContDynamics<Number>(std::string("linearSys"), A.rows(), B.cols(), C.rows()),
+    A_(A), B_(B), c_(c), C_(C), D_(0, 0), k_(0, 0){ 
+   
+}
+
+template <typename Number>
+LinearSys<Number>::LinearSys(Matrix_t<Number>& A, Matrix_t<Number>& B, Matrix_t<Number>& c, Matrix_t<Number>& C, Matrix_t<Number>& D)
+    :ContDynamics<Number>(std::string("linearSys"), A.rows(), B.cols(), C.rows()),
+    A_(A), B_(B), c_(c), C_(C), D_(D), k_(0, 0){ 
+   
+}
+
+template <typename Number>
+LinearSys<Number>::LinearSys(Matrix_t<Number>& A, Matrix_t<Number>& B, Matrix_t<Number>& c, Matrix_t<Number>& C, Matrix_t<Number>& D, Matrix_t<Number>& k)
+    :ContDynamics<Number>(std::string("linearSys"), A.rows(), B.cols(), C.rows()),
+    A_(A), B_(B), c_(c), C_(C), D_(D), k_(k){ 
+   
+}
+
+template <typename Number>
+LinearSys<Number>::LinearSys(std::string name, Matrix_t<Number>& A, Matrix_t<Number>& B)
+    :ContDynamics<Number>(name, A.rows(), B.cols(), 1),
+    A_(A), B_(B), c_(0, 0), C_(Eigen::MatrixXd::Identity(1,1)), D_(0, 0), k_(0, 0){ 
+   
+}
+
+template <typename Number>
+LinearSys<Number>::LinearSys(std::string name, Matrix_t<Number>& A, Matrix_t<Number>& B, Matrix_t<Number>& c)
+    :ContDynamics<Number>(name, A.rows(), B.cols(), 1),
+    A_(A), B_(B), c_(c), C_(Eigen::MatrixXd::Identity(1,1)), D_(0, 0), k_(0, 0){ 
+   
+}
+
+template <typename Number>
+LinearSys<Number>::LinearSys(std::string name, Matrix_t<Number>& A, Matrix_t<Number>& B, Matrix_t<Number>& c, Matrix_t<Number>& C)
+    :ContDynamics<Number>(name, A.rows(), B.cols(), C.rows()),
+    A_(A), B_(B), c_(c), C_(C), D_(0, 0), k_(0, 0){ 
+   
+}
+
+template <typename Number>
+LinearSys<Number>::LinearSys(std::string name, Matrix_t<Number>& A, Matrix_t<Number>& B, Matrix_t<Number>& c, Matrix_t<Number>& C, Matrix_t<Number>& D)
+    :ContDynamics<Number>(name, A.rows(), B.cols(), C.rows()),
+    A_(A), B_(B), c_(c), C_(C), D_(D), k_(0, 0){ 
+   
+}
+
+template <typename Number>
+LinearSys<Number>::LinearSys(std::string name, Matrix_t<Number>& A, Matrix_t<Number>& B, Matrix_t<Number>& c, Matrix_t<Number>& C, Matrix_t<Number>& D, Matrix_t<Number>& k)
+    :ContDynamics<Number>(name, A.rows(), B.cols(), C.rows()),
+    A_(A), B_(B), c_(c), C_(C), D_(D), k_(k){ 
+   
+}
+
 
 /*****************************************************************************
 *                                                                           *
@@ -41,24 +110,24 @@ LinearReachableSet<Number> LinearSys<Number>::initReach(Zonotope<Number>& Rinit,
 template <typename Number>
 LinearReachableSet<Number> LinearSys<Number>::initReach_Krylov(Zonotope<Number>& Rinit, ReachOptions<Number>& options){
     
-    return new LinearReachableSet<Number>();
+    return LinearReachableSet<Number>();
 }
 
 template <typename Number>
 void LinearSys<Number>::exponential(ReachOptions<Number>& options){
     // load data from object/options structure
     Matrix_t<Number> A = A_;
-    Matrix_t<Number> A_abs = Eigen::A_.cwiseAbs();
+    Matrix_t<Number> A_abs = A_.cwiseAbs();
     size_t taylorTerms = options.taylor_terms();
-    size_t dim = dim();
+    size_t dim_local = ContDynamics<Number>::dim();
     Number *factors = options.factor();
     
     // initialize
-    std::vector<Matrix_t<Number>> Apower = new std::vector<Matrix_t<Number>>(taylorTerms+1);
+    std::vector<Matrix_t<Number>> Apower = std::vector<Matrix_t<Number>>(taylorTerms+1);
     Apower[0] = A;
-    std::vector<Matrix_t<Number>> Apower_abs = new std::vector<Matrix_t<Number>>(taylorTerms+1);
+    std::vector<Matrix_t<Number>> Apower_abs = std::vector<Matrix_t<Number>>(taylorTerms+1);
     Apower_abs[0] = A_abs;
-    Matrix_t<Number> M = Eigen::Identity(dim,dim);
+    Matrix_t<Number> M = Eigen::MatrixXd::Identity(dim_local,dim_local);
 
     // compute powers for each term and sum of these
     for (size_t i = 0; i < taylorTerms; i++)
@@ -68,9 +137,11 @@ void LinearSys<Number>::exponential(ReachOptions<Number>& options){
         M = M + Apower_abs[i] * factors[i];
     }
     // determine error due to finite Taylor series
-    Matrix_t<Number> W = Eigen::(A_abs*options.timeStep()).exp() - M;
+    Matrix_t<Number> tmp = A_abs*options.time_step();
+    Matrix_t<Number> tmp_exp = tmp.array().exp();
+    Matrix_t<Number> W = tmp_exp - M;
     // compute absolute value of W for numerical stability
-    W = Eigen::W.cwiseAbs();
+    W =  W.cwiseAbs();
     IntervalMatrix E;
     E.inf = -W;
     E.sup = W;
@@ -86,11 +157,11 @@ void LinearSys<Number>::tie(ReachOptions<Number>& options){
     std::vector<Matrix_t<Number>> Apower = taylor_.powers;
     size_t taylorTerms = options.taylor_terms();
     Number* rbyfac = options.factor();
-    size_t dim = dim();
+    size_t dim_local = ContDynamics<Number>::dim();
 
     // initialize Asum
-    Matrix_t<Number> Asum_pos = Eigen::MatrixXd::Zero(dim);
-    Matrix_t<Number> Asum_neg = Eigen::MatrixXd::Zero(dim);
+    Matrix_t<Number> Asum_pos = Eigen::MatrixXd::Zero(dim_local, dim_local);
+    Matrix_t<Number> Asum_neg = Eigen::MatrixXd::Zero(dim_local, dim_local);
     
     for (size_t i = 2; i <= taylorTerms; i++)
     {
@@ -100,13 +171,13 @@ void LinearSys<Number>::tie(ReachOptions<Number>& options){
         double factor = (std::pow(i,exp1)-std::pow(i,exp2))*rbyfac[i-1];
         
         // init Apos, Aneg
-        Matrix_t<Number> Apos = Eigen::MatrixXd::Zero(dim);
-        Matrix_t<Number> Aneg = Eigen::MatrixXd::Zero(dim);
+        Matrix_t<Number> Apos = Eigen::MatrixXd::Zero(dim_local, dim_local);
+        Matrix_t<Number> Aneg = Eigen::MatrixXd::Zero(dim_local, dim_local);
 
         // obtain positive and negative parts
-        for (size_t j = 0; j < dim; j++)
+        for (size_t j = 0; j < dim_local; j++)
         {
-            for (size_t k = 0; k < dim; k++)
+            for (size_t k = 0; k < dim_local; k++)
             {
                 if(Apower[i-1](j, k)>0){
                     Apos(j, k) = Apower[i-1](j, k);
@@ -132,13 +203,13 @@ void LinearSys<Number>::tie(ReachOptions<Number>& options){
 template <typename Number>
 void LinearSys<Number>::inputSolution(ReachOptions<Number>& options){
     // set of possible inputs
-    Zonotope<Number> V = B_*options.U();
+    Zonotope<Number> V = options.U()*B_;
 
     // compute vTrans 
-    Zonotope<Number> vTrans = B_*options.uTrans();
+    Zonotope<Number> vTrans = options.uTrans_lin()*B_;
 
     // consider constant input
-    if (c_ != NULL){
+    if (c_ != Matrix_t<Number>(0, 0)){
         vTrans = vTrans + c_;
     }
 
@@ -151,23 +222,23 @@ void LinearSys<Number>::inputSolution(ReachOptions<Number>& options){
     Number *factors = options.factor();
 
     // init Vsum
-    Zonotope<Number> Vsum = r*V;
-    Matrix_t<Number> Asum = r*Eigen::MatrixXd::Identity(dim);
+    Zonotope<Number> Vsum = V*r;
+    Matrix_t<Number> Asum = r*Eigen::MatrixXd::Identity(dim, dim);
     // compute higher order terms
     for (size_t i = 0; i < taylorTerms; i++)
     {
-        Vsum = Vsum+Apower[i]*factors(i+1)*V;
-        Asum = Asum+Apower[i]*factors(i+1);
+        Vsum = Vsum+V*(Apower[i]*factors[i+1]);
+        Asum = Asum+Apower[i]*factors[i+1];
     }
 
     // compute overall solution
-    Zonotope<Number> inputSolV = Vsum+E*r*V;
+    Zonotope<Number> inputSolV = Vsum+V*E*r;
 
     // compute solution due to constant input
     IntervalMatrix eAtInt;
     eAtInt.inf = Asum+E.inf*r;
     eAtInt.sup = Asum+E.sup*r;
-    Zonotope<Number> inputSolVtrans = eAtInt*vTrans;
+    Zonotope<Number> inputSolVtrans = vTrans*eAtInt;
 
     // compute additional uncertainty if origin is not contained in input set
     Zonotope<Number> inputCorr;
@@ -176,23 +247,25 @@ void LinearSys<Number>::inputSolution(ReachOptions<Number>& options){
     }else{
         // compute inputF
         inputTie(options);
-        IntervalMatrix inputF = taylor_.inpufF;
-        inputCorr = inputF*vTrans;
+        IntervalMatrix inputF = taylor_.inputF;
+        inputCorr = vTrans*inputF;
     }
 
     // write to object structure
     taylor_.V = V;
-    Matrix_t<Number> SolV_Z << inputSolV.center(), inputSolV.generators();
-    if(Eigen::SolV_Z.colwise().any()){
+    Matrix_t<Number> SolV_Z = Matrix_t<Number>(inputSolV.center().size(), Eigen::Dynamic);
+    SolV_Z << inputSolV.center(), inputSolV.generators();
+    if(SolV_Z.any()){
         taylor_.RV = inputSolV;
     }else{
-        taylor_.RV = new Zonotope(dim);
+        taylor_.RV = Zonotope<Number>(dim);
     }
-    Matrix_t<Number> SolVtrans_Z << inputSolVtrans.center(), inputSolV.generators();
-    if(Eigen::SolVtrans_Z.colwise().any()){
+    Matrix_t<Number> SolVtrans_Z = Matrix_t<Number>(inputSolVtrans.center().size(), Eigen::Dynamic);
+    SolVtrans_Z << inputSolVtrans.center(), inputSolV.generators();
+    if(SolVtrans_Z.any()){
         taylor_.Rtrans = inputSolVtrans;
     }else{
-        taylor_.Rtrans = new Zonotope(dim);
+        taylor_.Rtrans = Zonotope<Number>(dim);
     }
     taylor_.inputCorr = inputCorr;
     taylor_.eAtInt = eAtInt;
@@ -205,11 +278,11 @@ void LinearSys<Number>::inputTie(ReachOptions<Number>& options){
     IntervalMatrix E = taylor_.error;
     size_t taylorTerms = options.taylor_terms();
     double r = options.time_step();
-    size_t dim = A.size();
+    size_t dim = A_.size();
 
     // initialize Asum
-    Matrix_t<Number> Asum_pos = Eigen::MatrixXd::Zero(dim);
-    Matrix_t<Number> Asum_neg = Eigen::MatrixXd::Zero(dim);
+    Matrix_t<Number> Asum_pos = Eigen::MatrixXd::Zero(dim, dim);
+    Matrix_t<Number> Asum_neg = Eigen::MatrixXd::Zero(dim, dim);
     
     for (size_t i = 2; i <= taylorTerms+1; i++)
     {
@@ -219,8 +292,8 @@ void LinearSys<Number>::inputTie(ReachOptions<Number>& options){
         double factor = (std::pow(i,exp1)-std::pow(i,exp2))*options.factor()[i-1];
         
         // init Apos, Aneg
-        Matrix_t<Number> Apos = Eigen::MatrixXd::Zero(dim);
-        Matrix_t<Number> Aneg = Eigen::MatrixXd::Zero(dim);
+        Matrix_t<Number> Apos = Eigen::MatrixXd::Zero(dim, dim);
+        Matrix_t<Number> Aneg = Eigen::MatrixXd::Zero(dim, dim);
 
         // obtain positive and negative parts
         for (size_t j = 0; j < dim; j++)
@@ -246,7 +319,7 @@ void LinearSys<Number>::inputTie(ReachOptions<Number>& options){
 
     // compute error due to finite Taylor series according to internal document "Input Error Bounds in Reachability Analysis"
     IntervalMatrix Einput;
-    Einput.inf = Einput*r;
+    Einput.inf = Asum_neg*r;
     Einput.sup = Asum_pos*r;
 
     // write to object structure
@@ -266,7 +339,7 @@ LinearReachableSet<Number> LinearSys<Number>::initReach_Euclidean(Zonotope<Numbe
     taylor_.timeStep = options.time_step();
 
     // compute reachable set of first time interval
-    Matrix_t<Number> eAt = Eigen::(A_*options.time_step()).array().exp();
+    Matrix_t<Number> eAt = (A_*options.time_step()).array().exp();
     // save data to object structure
     taylor_.eAt = eAt;
 
@@ -276,8 +349,8 @@ LinearReachableSet<Number> LinearSys<Number>::initReach_Euclidean(Zonotope<Numbe
     Zonotope<Number> Rtrans = taylor_.Rtrans;
 
     // first time step homogeneous solution
-    Zonotope<Number> Rhom_tp = eAt*Rinit + Rtrans;
-    Zonotope<Number> Rhom = Rinit.enclose(Rhom_tp)+F*Rinit+inputCorr;
+    Zonotope<Number> Rhom_tp = Rinit*eAt + Rtrans;
+    Zonotope<Number> Rhom = Rinit.enclose(Rhom_tp)+Rinit*F+inputCorr;
 
     // reduce zonotope
     Rhom.Reduce(options.zonotope_order());
@@ -291,7 +364,7 @@ LinearReachableSet<Number> LinearSys<Number>::initReach_Euclidean(Zonotope<Numbe
     // if (strcmp(options.linAlg,'wrapping-free') == 0){
     //     options.Rpar=interval(RV);
     // }else{
-        options.Rpar=RV;
+        options.set_Rpar(RV);
     // }
     options.set_Rtrans(taylor_.Rtrans);
 
@@ -310,7 +383,7 @@ LinearReachableSet<Number> LinearSys<Number>::initReach_Euclidean(Zonotope<Numbe
     // }
 
     // write results to reachable set struct Rfirst
-    LinearReachableSet<Number> Rfirst = new LinearReachableSet<Number>();
+    LinearReachableSet<Number> Rfirst = LinearReachableSet<Number>();
     Rfirst.set_time_point(Rtotal_tp);
     Rfirst.set_time_interval(Rtotal);
 
@@ -318,12 +391,12 @@ LinearReachableSet<Number> LinearSys<Number>::initReach_Euclidean(Zonotope<Numbe
 }
 
 template <typename Number>
-Zonotope<Number> LinearSys<Number>::error_solution(ReachOptions<Number>& options, Zonotope<Number>& Vdyn, Zonotope<Number>& Vstat){
+Zonotope<Number> LinearSys<Number>::error_solution(ReachOptions<Number>& options, Zonotope<Number> Vdyn, Zonotope<Number> Vstat){
     Zonotope<Number> errorStat;
-    if(Vstat == NULL){
-        errorStat = new Zonotope<Number>();
+    if(Vstat.Empty()){
+        errorStat = Zonotope<Number>();
     }else{
-        errorStat = taylor_.eAtInt*Vstat;
+        errorStat = Vstat*taylor_.eAtInt;
     }
     // load data from object/options structure
     std::vector<Matrix_t<Number>> Apower = taylor_.powers;
@@ -333,11 +406,11 @@ Zonotope<Number> LinearSys<Number>::error_solution(ReachOptions<Number>& options
     Number *factors = options.factor();
 
     // initialize Asum
-    Zonotope<Number> Asum=r*Vdyn;
+    Zonotope<Number> Asum=Vdyn*r;
     for (size_t i = 0; i < taylorTerms; i++)
     {
         // compute powers
-        Zonotope<Number> ApowerV = factors[i+1]*Apower[i]*Vdyn;
+        Zonotope<Number> ApowerV = Vdyn*(factors[i+1]*Apower[i]);
         // compute sums
         Asum = Asum+ApowerV;
     }
@@ -346,7 +419,7 @@ Zonotope<Number> LinearSys<Number>::error_solution(ReachOptions<Number>& options
     // if(isa(Vdyn,'zonoBundle')){
     //     F=E*Vdyn.Z{1}*r;
     // }else{
-        F=E*Vdyn*r;
+        F=Vdyn*E*r;
     // }
     // Compute error solution (dyn. + stat.)
     Zonotope<Number> Rerror = Asum+F+errorStat;
