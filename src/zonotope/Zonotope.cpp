@@ -381,23 +381,43 @@ Zonotope<Number> Zonotope<Number>::operator+(const Zonotope& another_zonotope) c
 
 template <typename Number>
 Zonotope<Number> Zonotope<Number>::operator+(const Vector_t<Number>& vector) const{
-    return new Zonotope<Number>();
+    Zonotope<Number> newZ= new Zonotope(this->center_, this->generators_);
+    newZ.set_center(this->center_ + vector);
+    return newZ;
 }
 
 template <typename Number>
 Zonotope<Number> Zonotope<Number>::operator+(const Number num) const{
-    return new Zonotope<Number>();
-}
-
-template <typename Number>
-Zonotope<Number> Zonotope<Number>::operator-(const Number num) const{
-    return new Zonotope<Number>();
+    Zonotope<Number> newZ= new Zonotope(this->center_, this->generators_);
+    size_t dim = newZ.dimension();
+    Vector_t<Number> vector[dim];
+    for(size_t i=0; i<dim; i++){
+        vector[i] = num;
+    }
+    newZ.set_center(this->center_ + vector);
+    return newZ;
 }
 
 template <typename Number>
 Zonotope<Number> Zonotope<Number>::operator-(const Vector_t<Number>& vector) const{
-    return new Zonotope<Number>();
+    Zonotope<Number> newZ = new Zonotope(this->center_, this->generators_);
+    newZ.set_center(this->center_ - vector);
+
+    return newZ;
 }
+
+
+template <typename Number>
+Zonotope<Number> Zonotope<Number>::operator-(const Number num) const{
+    //compute center
+    size_t dim = this->dimension_;
+    Vector_t<Number> vector[dim];
+    for(size_t i=0; i<dim; i++){
+        vector[i] = num;
+    }
+    return this-vector;
+}
+
 
 
 template <typename Number>
