@@ -380,13 +380,8 @@ Zonotope<Number> Zonotope<Number>::operator+(const Zonotope& another_zonotope) c
 }
 
 template <typename Number>
-Zonotope<Number> Zonotope<Number>::Plus(const Vector_t<Number>& vector) const{
-    return new Zonotope<Number>();
-}
-
-template <typename Number>
 Zonotope<Number> Zonotope<Number>::operator+(const Vector_t<Number>& vector) const{
-    return Plus(vector);
+    return new Zonotope<Number>();
 }
 
 template <typename Number>
@@ -403,22 +398,7 @@ template <typename Number>
 Zonotope<Number> Zonotope<Number>::operator-(const Vector_t<Number>& vector) const{
     return new Zonotope<Number>();
 }
-// template <typename Number>
-// Zonotope<Number> Zonotope<Number>::operator&(const Zonotope& another_zonotope) const{
-//     // convert sets to constrained zonotopes
 
-//     return Plus(vector);
-// }
-
-/**
- * @brief Get the enclosure for the convex hull of two zonotope
- * @param another_zonotope 
- * @return a  zonotope enclosing the convex hull
- */
-template <typename Number>
-Zonotope<Number> Zonotope<Number>::Convexhull(const Zonotope& another_zonotope) const{
-    
-}
 
 template <typename Number>
 IntervalMatrix Zonotope<Number>::interval() const{
