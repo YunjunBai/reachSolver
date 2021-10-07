@@ -56,40 +56,43 @@ NonlinearSys<Number>::NonlinearSys(std::string name, function_type fun_handle, s
    
 }
 
+template <typename Number>
+NonlinearSys<Number>::~NonlinearSys(){}
+
 /*****************************************************************************
 *                                                                           *
 *                       Public Functions on Properties                      *
 *                                                                           *
 *****************************************************************************/
 
-template <typename Number>
-const typename NonlinearSys<Number>::function_type NonlinearSys<Number>::mFile() const{
-    return mFile_;
-}
+// template <typename Number>
+// const typename NonlinearSys<Number>::function_type NonlinearSys<Number>::mFile() const{
+//     return mFile_;
+// }
 
 
-template <typename Number>
-const typename NonlinearSys<Number>::function_type NonlinearSys<Number>::jacobian() const{
-    return jacobian_;
-}
+// template <typename Number>
+// const typename NonlinearSys<Number>::function_type NonlinearSys<Number>::jacobian() const{
+//     return jacobian_;
+// }
 
 
-template <typename Number>
-const typename NonlinearSys<Number>::function_type NonlinearSys<Number>::hessian() const{
-    return hessian_;
-}
+// template <typename Number>
+// const typename NonlinearSys<Number>::function_type NonlinearSys<Number>::hessian() const{
+//     return hessian_;
+// }
 
 
-template <typename Number>
-const typename NonlinearSys<Number>::function_type NonlinearSys<Number>::thirdOrderTensor() const{
-    return thirdOrderTensor_;
-}
+// template <typename Number>
+// const typename NonlinearSys<Number>::function_type NonlinearSys<Number>::thirdOrderTensor() const{
+//     return thirdOrderTensor_;
+// }
 
 
-template <typename Number>
-const typename NonlinearSys<Number>::function_type NonlinearSys<Number>::tensors() const{
-    return tensors_;
-}
+// template <typename Number>
+// const typename NonlinearSys<Number>::function_type NonlinearSys<Number>::tensors() const{
+//     return tensors_;
+// }
 
 
 /*****************************************************************************
@@ -100,7 +103,7 @@ const typename NonlinearSys<Number>::function_type NonlinearSys<Number>::tensors
 
 template <typename Number>
 ReachableSet<Number> NonlinearSys<Number>::createReachSetObject(TimeInt<Number>& time_int, TimePoint<Number>& time_point){
-    
+    return ReachableSet<Number>();
 }
 
 template <typename Number>
@@ -108,10 +111,11 @@ ReachOptions<Number> NonlinearSys<Number>::checkOptionsReach(ReachOptions<Number
     return options;
 }
 
-template <typename Number>
-void NonlinearSys<Number>::derivatives(ReachOptions<Number>& options){
+// template <typename Number>
+// void NonlinearSys<Number>::derivatives(ReachOptions<Number>& options){
     
-}
+// }
+
 
 // template <typename Number>
 // int NonlinearSys<Number>::reach(ReachOptions<Number>& options, ReachSpecification& spec, ReachableSet<Number> & R){
@@ -122,7 +126,7 @@ int NonlinearSys<Number>::reach(ReachOptions<Number>& options, ReachableSet<Numb
     // options preprocessing
     options = checkOptionsReach(options, 0);
     // compute symbolic derivatives
-    derivatives(options);
+    // derivatives(options);
 
     // obtain factors for initial state and input solution time step
     int r = options.time_step();
@@ -362,7 +366,9 @@ LinearSys<Number> NonlinearSys<Number>::linearize(ReachOptions<Number>& options,
     //     p.x = options.linearizationPoint();
     // }else{
         // linearization point p.x of the state is the center of the last reachable set R translated by 0.5*delta_t*f0
-        Vector_t<Number> f0prev = mFile_(R.center(), p.u);
+        Vector_t<Number> tmp_vector1 = Vector_t<Number>(1);
+        tmp_vector1 << p.u;
+        Vector_t<Number> f0prev = mFile_(R.center(), tmp_vector1);
         try
         {
             p.x = R.center() + f0prev*0.5*options.time_step();
@@ -374,12 +380,14 @@ LinearSys<Number> NonlinearSys<Number>::linearize(ReachOptions<Number>& options,
     // }
 
     // substitute p into the system equation to obtain the constant input
-    Vector_t<Number> f0 = mFile_(p.x, p.u);
+    Vector_t<Number> tmp_vector2 = Vector_t<Number>(1);
+    tmp_vector2 << p.u;
+    Vector_t<Number> f0 = mFile_(p.x, tmp_vector2);
     
     // substitute p into the Jacobian with respect to x and u to obtain the system matrix A and the input matrix B
     Matrix_t<Number> A = Matrix_t<Number>();
     Matrix_t<Number> B = Matrix_t<Number>();
-    jacobian_(p.x, p.u, A, B);
+    jacobian(this->mFile_ ,p.x, tmp_vector2, A, B);
     Matrix_t<Number> A_lin = A;
     Matrix_t<Number> B_lin = B;
     linOptions = options;
@@ -434,7 +442,7 @@ int NonlinearSys<Number>::linReach(ReachOptions<Number>& options, ReachableSetEl
     LinearSys<Number> linSys = linearize(options, Rinit, linOptions); 
 
     // translate Rinit by linearization point
-    Zonotope<Number> Rdelta = Rinit.Plus(-linerror_.p.x);
+    Zonotope<Number> Rdelta = Rinit - linerror_.p.x;
 
     // compute reachable set of the linearized system
     LinearReachableSet<Number> R = linSys.initReach(Rdelta, linOptions);
@@ -543,7 +551,7 @@ Vector_t<Number> NonlinearSys<Number>::abstrerr_lin(ReachOptions<Number>& option
         //     if(name_ == "nonlinParamSys"){
 
         //     }else{
-                H = hessian_(totalInt_x,totalInt_u);
+                H = hessian(this->mFile_f_, totalInt_x, totalInt_u);
         //     }
         // }
 

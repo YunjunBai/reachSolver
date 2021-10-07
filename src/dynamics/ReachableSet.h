@@ -12,6 +12,7 @@
 #include "zonotope/BasicObject.h"
 //#include "TimeRelated.h"
 #include "zonotope/Zonotope.h"
+#include "ReachOptions.h"
 namespace reachSolver{
 
 /**
@@ -271,10 +272,8 @@ class ReachableSet{
      * @brief delete reachable sets that are already covered by other sets
      * @param Rold reachable sets of previous time steps
      * @param options options for the computation of the reachable set
-     * @return R - reachable sets
      */
-    // ReachableSet<Number> deleteRedundantSets(ReachableSet<Number> Rold, ReachSpecification& options);
-    ReachableSet<Number> deleteRedundantSets(ReachableSet<Number> Rold, ReachOptions<Number>& options);
+    void deleteRedundantSets(ReachableSet<Number> Rold, ReachOptions<Number>& options);
 };
 /** @} */
 

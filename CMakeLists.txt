@@ -4,7 +4,7 @@
 # Contact:
 # Author: 
 
-cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 project(reachsolver CXX C)
 set(CMAKE_VERBOSE_MAKEFILE on)
 
@@ -31,6 +31,7 @@ option(ENABLE_DOC "Enable generating documents" OFF)
 
 # Libraries
 load_library(${PROJECT_NAME} GTest 0)
+find_package(autodiff)
 
 enable_testing()
 

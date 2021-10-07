@@ -11,9 +11,11 @@
 
 namespace reachSolver{
 
+template class ReachOptions<double>;
+
 template <typename Number>
 ReachOptions<Number>::ReachOptions(){
-
+    
 }
 
 template <typename Number>
@@ -28,7 +30,7 @@ void ReachOptions<Number>::set_t(double t){
 
 template <typename Number>
 const double ReachOptions<Number>::tStart() const{
-    return tStart__;
+    return tStart_;
 }
 
 template <typename Number>
@@ -192,7 +194,7 @@ const size_t ReachOptions<Number>::tensor_order() const{
 
 template <typename Number>
 void ReachOptions<Number>::set_tensor_order(size_t tensor_order){
-    ttensor_order_ = tensor_order;
+    tensor_order_ = tensor_order;
 }
 
 template <typename Number>

@@ -59,6 +59,17 @@
         "jacobi": "cpp",
         "lu": "cpp",
         "qr": "cpp",
-        "svd": "cpp"
+        "svd": "cpp",
+        "bitset": "cpp",
+        "chrono": "cpp",
+        "condition_variable": "cpp",
+        "list": "cpp",
+        "ratio": "cpp",
+        "regex": "cpp",
+        "future": "cpp",
+        "mutex": "cpp",
+        "shared_mutex": "cpp",
+        "thread": "cpp",
+        "variant": "cpp"
     }
 }

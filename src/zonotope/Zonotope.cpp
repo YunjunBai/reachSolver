@@ -42,7 +42,7 @@ template <typename Number>
 Zonotope<Number>::Zonotope(IntervalMatrix interval_m){
     center_ = 0.5*(interval_m.inf + interval_m.sup);
     generators_ =  (0.5*(interval_m.sup - interval_m.inf)).diagonal();
-    dimension_ = center.rows();
+    dimension_ = center_.rows();
 }
 
 /**
@@ -228,6 +228,16 @@ bool Zonotope<Number>::ChangeDimension(size_t new_dim){
     }
 }
 
+template <typename Number>
+bool compareVectors( const Vector_t<Number>& v1, const Vector_t<Number>& v2 ) {
+	Number v1_sum = v1.array().abs().matrix().sum();
+	Number v2_sum = v2.array().abs().matrix().sum();
+	Number v1_inf = v1.array().abs().maxCoeff();
+	Number v2_inf = v2.array().abs().maxCoeff();
+
+	return ( v1_sum - v1_inf ) < ( v2_sum - v2_inf );
+}
+
 /**
  * @brief Reduces the order of a zonotope
  * @param limitOrder order of reduced zonotope
@@ -248,7 +258,7 @@ void Zonotope<Number>::Reduce(unsigned limitOrder){
 		// Sort generators according to the difference between 1-norm and infty-norm
 		// (i.e.: How suitable are the generators to
 		// be overapproximated by an interval hull)
-		std::sort( sortedGenerators.begin(), sortedGenerators.end(), ZUtility::compareVectors<Number> );
+		std::sort( sortedGenerators.begin(), sortedGenerators.end(), compareVectors<Number> );
 
 		// Row-wise sum of all 2*dim chosen generators (absolute value)
 		Vector_t<Number> sumVector = Vector_t<Number>::Zero( dim );
@@ -274,6 +284,17 @@ void Zonotope<Number>::Reduce(unsigned limitOrder){
 		generators_ = reducedGenerators;
 	}
 	//std::cout << __func__ << ": Reduced order: " << this->order() << std::endl;
+}
+
+template <typename Number>
+int Zonotope<Number>::Empty(){
+    if (this->dimension_ == 0 && this->center_ == Vector_t<Number>(0, 1) && this->generators_ == Matrix_t<Number>(0, 0))
+    {
+        return 1;
+    }else{
+        return 0;
+    }
+    
 }
 
 /**
@@ -335,17 +356,17 @@ template <typename Number>
 Zonotope<Number> Zonotope<Number>::Times(const IntervalMatrix int_matrix) const{
     Matrix_t<Number> M_min = int_matrix.inf;
     Matrix_t<Number> M_max = int_matrix.sup;
-    Zonotope<Number> result;
     // get center of interval matrix
     Matrix_t<Number> T = 0.5*(M_max+M_min);
     // get symmetric interval matrix
     Matrix_t<Number> S = 0.5*(M_max-M_min);
-    Matrix_t<Number> Z << center_, generators_;
-    Matrix_t<Number> Zabssum = Eigen::Z.cwiseAbs().rowwise().sum();
+    Matrix_t<Number> Z = Matrix_t<Number>();
+    Z << center_, generators_;
+    Matrix_t<Number> Zabssum = Z.cwiseAbs().rowwise().sum();
     // compute new zonotope
     Zonotope<Number> result;
     result.set_center(T*Z);
-    result.set_generators(Eigen::(S*Zabssum).diagonal());
+    result.set_generators((S*Zabssum).diagonal());
     return result;
 }
 
@@ -381,16 +402,16 @@ Zonotope<Number> Zonotope<Number>::operator+(const Zonotope& another_zonotope) c
 
 template <typename Number>
 Zonotope<Number> Zonotope<Number>::operator+(const Vector_t<Number>& vector) const{
-    Zonotope<Number> newZ= new Zonotope(this->center_, this->generators_);
+    Zonotope<Number> newZ = Zonotope(this->center_, this->generators_);
     newZ.set_center(this->center_ + vector);
     return newZ;
 }
 
 template <typename Number>
 Zonotope<Number> Zonotope<Number>::operator+(const Number num) const{
-    Zonotope<Number> newZ= new Zonotope(this->center_, this->generators_);
+    Zonotope<Number> newZ = Zonotope(this->center_, this->generators_);
     size_t dim = newZ.dimension();
-    Vector_t<Number> vector[dim];
+    Vector_t<Number> vector = Vector_t<Number>(dim);
     for(size_t i=0; i<dim; i++){
         vector[i] = num;
     }
@@ -400,7 +421,7 @@ Zonotope<Number> Zonotope<Number>::operator+(const Number num) const{
 
 template <typename Number>
 Zonotope<Number> Zonotope<Number>::operator-(const Vector_t<Number>& vector) const{
-    Zonotope<Number> newZ = new Zonotope(this->center_, this->generators_);
+    Zonotope<Number> newZ = Zonotope(this->center_, this->generators_);
     newZ.set_center(this->center_ - vector);
 
     return newZ;
@@ -411,20 +432,49 @@ template <typename Number>
 Zonotope<Number> Zonotope<Number>::operator-(const Number num) const{
     //compute center
     size_t dim = this->dimension_;
-    Vector_t<Number> vector[dim];
+    Vector_t<Number> vector = Vector_t<Number>(dim);
     for(size_t i=0; i<dim; i++){
         vector[i] = num;
     }
-    return this-vector;
+    return (*this)-vector;
 }
 
+/**
+ * @brief Generates a zonotope that encloses a zonotopes and its linear transformation
+ * @param another_zonotope second zonotope object, satisfying Z2 = (M * Z1) + Zplus
+ * @return zonotope, that encloses Z1 and Z2
+ */
+template <typename Number>
+Zonotope<Number> Zonotope<Number>::enclose(const Zonotope& another_zonotope) const{
+    Matrix_t<Number> Z1  = Matrix_t<Number>();
+    Z1 << center_, generators_;
+    Matrix_t<Number> Z2  = Matrix_t<Number>();
+    Z2 << another_zonotope.center(), another_zonotope.generators();
+    size_t generators1 = this->generators().cols()+1;
+    size_t generators2 = another_zonotope.generators().cols()+1;
+    Matrix_t<Number> Zcut, Zadd, Zequal;
+    if(generators2 <= generators1){
+        Zcut = Z1.middleCols(0, generators2);
+        Zadd = Z1.middleCols(generators2+1, generators1-generators2);
+        Zequal = Z2;
+    }else{
+        Zcut = Z2.middleCols(0, generators2);
+        Zadd = Z2.middleCols(generators2+1, generators1-generators2);
+        Zequal = Z1;
+    }
 
+    Matrix_t<Number> newZ;
+    newZ << (Zcut+Zequal)/2, (Zcut-Zequal)/2, Zadd;
+    Zonotope<Number> newZonotope = Zonotope(newZ.middleCols(0, 0), newZ.middleCols(1, newZ.cols()-1));
+    return newZonotope;
+}
 
 template <typename Number>
 IntervalMatrix Zonotope<Number>::interval() const{
-    Matrix_t<Number> Z << center_, generators_;
+    Matrix_t<Number> Z  = Matrix_t<Number>();
+    Z << center_, generators_;
     // determine left and right limit
-    Matrix_t<Number> delta = Eigen::Z.cwiseAbs().rowwise().sum()-Eigen::center_.cwiseAbs();
+    Matrix_t<Number> delta = Z.cwiseAbs().rowwise().sum()-center_.cwiseAbs();
     Matrix_t<Number> leftLimit = center_-delta;
     Matrix_t<Number> rightLimit = center_+delta;
 

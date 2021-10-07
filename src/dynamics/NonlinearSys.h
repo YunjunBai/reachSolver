@@ -13,6 +13,7 @@
 
 #include "ContDynamics.h"
 #include "LinearSys.h"
+#include "derivatives.h"
 namespace reachSolver{
 
 
@@ -25,11 +26,13 @@ namespace reachSolver{
 template <typename Number>
 class NonlinearSys : private ContDynamics<Number>{
   private:
-    typedef Vector_t<Number> (*function_type)(Vector_t<Number> param1, Number param2);
+    typedef Vector_t<Number> (*function_type)(Vector_t<Number> param1, Vector_t<Number> param2);
      
-    function_type mFile_;
-    function_type jacobian_;
-    function_type hessian_;
+    Vector_t<Number> (*mFile_)(Vector_t<Number> vector1, Vector_t<Number> vector2);
+    // autodiff::dual2nd (*mFile_f[6])(autodiff::ArrayXdual2nd& vector1, autodiff::ArrayXdual2nd& vector2);
+    Number (*mFile_f_[6])(Vector_t<Number> vector1, Vector_t<Number> vector2);
+    // void jacobian_(Vector_t<Number> vector1, Vector_t<Number> vector2, Matrix_t<Number> matrix1, Matrix_t<Number> matrix2);
+    // std::vector<IntervalMatrix> hessian_(IntervalMatrix im1, IntervalMatrix im2);
     function_type thirdOrderTensor_;
     function_type tensors_;
 
@@ -112,31 +115,31 @@ class NonlinearSys : private ContDynamics<Number>{
      * @brief Get the mFile handle
      * @return mFile handle
      */
-    const function_type mFile() const;
+    // const function_type mFile() const;
 
     /**
      * @brief Get the jacobian
      * @return jacobian handle
      */
-    const function_type jacobian() const;
+    // const function_type jacobian() const;
 
     /**
      * @brief Get the hessian
      * @return hessian handle
      */
-    const function_type hessian() const;
+    // const function_type hessian() const;
 
     /**
      * @brief Get the thirdOrderTensor
      * @return thirdOrderTensor handle
      */
-    const function_type thirdOrderTensor() const;
+    // const function_type thirdOrderTensor() const;
 
     /**
      * @brief Get the tensors
      * @return tensors handle
      */
-    const function_type tensors() const;
+    // const function_type tensors() const;
 
     /**
      * @brief Get the linerror

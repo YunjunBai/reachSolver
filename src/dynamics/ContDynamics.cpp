@@ -29,6 +29,9 @@ ContDynamics<Number>::ContDynamics(std::string name, size_t dim, size_t num_inpu
 }
 
 template <typename Number>
+ContDynamics<Number>::~ContDynamics(){}
+
+template <typename Number>
 const std::string ContDynamics<Number>::name() const{
     return name_;
 }

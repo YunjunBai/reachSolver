@@ -90,6 +90,8 @@ LinearSys<Number>::LinearSys(std::string name, Matrix_t<Number>& A, Matrix_t<Num
    
 }
 
+template <typename Number>
+LinearSys<Number>::~LinearSys(){}
 
 /*****************************************************************************
 *                                                                           *

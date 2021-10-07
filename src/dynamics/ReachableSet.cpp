@@ -11,19 +11,23 @@
 
 namespace reachSolver{
 
+template class ReachableSetElement<double>;
+template class ReachableSet<double>;
+template class LinearReachableSet<double>;
+
 /*************************Class  ReachableSetElement************************/
 template <typename Number>
 ReachableSetElement<Number>::ReachableSetElement()
-:set_(new Zonotope<Number>()),error_(new Vector_t<Number>()),prev_(0),parent_(0){
+:set_(Zonotope<Number>()),error_(Vector_t<Number>()),prev_(0),parent_(0){
 }
 
 template <typename Number>
-ReachableSetElement<Number>::ReachableSetElement(Zonotope<Number> set, std::vector<Number> error)
+ReachableSetElement<Number>::ReachableSetElement(Zonotope<Number> set, Vector_t<Number> error)
 :set_(set),error_(error),prev_(0),parent_(0){
 }
 
 template <typename Number>
-const Zonotope<Number> ReachableSetElement<Number>::rs() const{
+Zonotope<Number> ReachableSetElement<Number>::rs() const{
     return set_;
 }
 
@@ -33,7 +37,7 @@ void ReachableSetElement<Number>::set_rs(Zonotope<Number>& set){
 }
 
 template <typename Number>
-const Vector_t<Number> ReachableSetElement<Number>::error() const{
+Vector_t<Number> ReachableSetElement<Number>::error() const{
     return error_;
 }
 
@@ -65,25 +69,25 @@ void ReachableSetElement<Number>::set_parent(int parent){
 /*************************Class  ReachableSet************************/
 template <typename Number>
 ReachableSet<Number>::ReachableSet()
-    :time_point_(new std::vector<ReachableSetElement<Number>>()),
-    time_interval_(new std::vector<ReachableSetElement<Number>>()),
-    R0_(new std::vector<ReachableSetElement<Number>>()),
+    :time_point_(std::vector<ReachableSetElement<Number>>()),
+    time_interval_(std::vector<ReachableSetElement<Number>>()),
+    R0_(std::vector<ReachableSetElement<Number>>()),
     parent_rs_(0), loc_(0), internalCount_(0){
 }
 
 template <typename Number>
 ReachableSet<Number>::ReachableSet(std::vector<ReachableSetElement<Number>>& time_point)
     :time_point_(time_point),
-    time_interval_(new std::vector<ReachableSetElement<Number>>()),
-    R0_(new std::vector<ReachableSetElement<Number>>()),
+    time_interval_(std::vector<ReachableSetElement<Number>>()),
+    R0_(std::vector<ReachableSetElement<Number>>()),
     parent_rs_(0),loc_(0), internalCount_(0){
 }
 
 template <typename Number>
 ReachableSet<Number>::ReachableSet(std::vector<ReachableSetElement<Number>>& time_point, int parent)
     :time_point_(time_point),
-    time_interval_(new std::vector<ReachableSetElement<Number>>()),
-    R0_(new std::vector<ReachableSetElement<Number>>()),
+    time_interval_(std::vector<ReachableSetElement<Number>>()),
+    R0_(std::vector<ReachableSetElement<Number>>()),
     parent_rs_(parent), loc_(0), internalCount_(0){
 }
 
@@ -91,15 +95,15 @@ template <typename Number>
 ReachableSet<Number>::ReachableSet(std::vector<ReachableSetElement<Number>>& time_point, std::vector<ReachableSetElement<Number>>& time_interval)
     :time_point_(time_point),
     time_interval_(time_interval),
-    R0_(new std::vector<ReachableSetElement<Number>>()),
+    R0_(std::vector<ReachableSetElement<Number>>()),
     parent_rs_(0),loc_(0), internalCount_(0){
 }
 
 template <typename Number>
 ReachableSet<Number>::ReachableSet(std::vector<ReachableSetElement<Number>>& time_point, int parent, int loc)
     :time_point_(time_point),
-    time_interval_(new std::vector<ReachableSetElement<Number>>()),
-    R0_(new std::vector<ReachableSetElement<Number>>()),
+    time_interval_(std::vector<ReachableSetElement<Number>>()),
+    R0_(std::vector<ReachableSetElement<Number>>()),
     parent_rs_(parent),loc_(loc), internalCount_(0){
 }
 
@@ -107,7 +111,7 @@ template <typename Number>
 ReachableSet<Number>::ReachableSet(std::vector<ReachableSetElement<Number>>& time_point, std::vector<ReachableSetElement<Number>>& time_interval, int parent)
     :time_point_(time_point),
     time_interval_(time_interval),
-    R0_(new std::vector<ReachableSetElement<Number>>()),
+    R0_(std::vector<ReachableSetElement<Number>>()),
     parent_rs_(parent),loc_(0), internalCount_(0){
 }
 
@@ -115,9 +119,12 @@ template <typename Number>
 ReachableSet<Number>::ReachableSet(std::vector<ReachableSetElement<Number>>& time_point, std::vector<ReachableSetElement<Number>>& time_interval, int parent, int loc)
     :time_point_(time_point),
     time_interval_(time_interval),
-    R0_(new std::vector<ReachableSetElement<Number>>()),
+    R0_(std::vector<ReachableSetElement<Number>>()),
     parent_rs_(parent),loc_(loc), internalCount_(0){
 }
+
+template <typename Number>
+ReachableSet<Number>::~ReachableSet(){}
 
 template <typename Number>
 const std::vector<ReachableSetElement<Number>> ReachableSet<Number>::time_point() const{
@@ -135,7 +142,7 @@ const std::vector<ReachableSetElement<Number>> ReachableSet<Number>::time_interv
 }
 
 template <typename Number>
-void ReachableSet<Number>::set_time_point(std::vector<ReachableSetElement<Number>>& time_interval){
+void ReachableSet<Number>::set_time_interval(std::vector<ReachableSetElement<Number>>& time_interval){
     time_interval_ = time_interval;
 }
 
@@ -180,7 +187,7 @@ void ReachableSet<Number>::set_internalCount(int internalCount){
 }
 
 template <typename Number>
-ReachableSet<Number> ReachableSet<Number>::deleteRedundantSets(ReachableSet<Number> Rold, ReachOptions<Number>& options){
+void ReachableSet<Number>::deleteRedundantSets(ReachableSet<Number> Rold, ReachOptions<Number>& options){
     // set reduction method
     // redMethod='pca';
     if(Rold.internalCount() == 0){
@@ -189,9 +196,9 @@ ReachableSet<Number> ReachableSet<Number>::deleteRedundantSets(ReachableSet<Numb
         this->internalCount_ = Rold.internalCount()+1;
     }
 
-    if(this.internalCount_ == options.reductionInterval()){
+    if(this->internalCount_ == options.reductionInterval()){
         // reset internal count
-        thjs->internalCount = 1;
+        this->internalCount_ = 1;
         // overapproximate reachable set of time point(!) by parallelpipeds and
         // save them as polytopes
         // R.P=[];
@@ -202,19 +209,23 @@ ReachableSet<Number> ReachableSet<Number>::deleteRedundantSets(ReachableSet<Numb
     }else if(this->internalCount_ == 2){
         // just ignore for using polytope
     }
+
 }
 
 /*************************Class  LinearReachableSet************************/
 
 template <typename Number>
 LinearReachableSet<Number>::LinearReachableSet()
-:time_point_(new Zonotope<Number>()),time_interval_(new Zonotope<Number>()){
+:time_point_(Zonotope<Number>()),time_interval_(Zonotope<Number>()){
 }
 
 template <typename Number>
 LinearReachableSet<Number>::LinearReachableSet(Zonotope<Number> & time_point, Zonotope<Number> & time_interval)
 :time_point_(time_point),time_interval_(time_interval){
 }
+
+template <typename Number>
+LinearReachableSet<Number>::~LinearReachableSet(){}
 
 template <typename Number>
 const Zonotope<Number> LinearReachableSet<Number>::time_point() const{
@@ -232,7 +243,7 @@ const Zonotope<Number> LinearReachableSet<Number>::time_interval() const{
 }
 
 template <typename Number>
-void LinearReachableSet<Number>::set_time_point(Zonotope<Number>& time_interval){
+void LinearReachableSet<Number>::set_time_interval(Zonotope<Number>& time_interval){
     time_interval_ = time_interval;
 }
 

@@ -1,11 +1,14 @@
 # Create static and shared libraries
 
 file(GLOB_RECURSE sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)
-list(FILTER sources EXCLUDE REGEX old.cpp|ReachSpecification.c|test/*)
+list(FILTER sources EXCLUDE REGEX old.cpp)
 
-#add_subdirectory(zonotope)
-#add_subdirectory(dynamics)
+# add_subdirectory(zonotope)
+# add_subdirectory(dynamics)
 
+message("${sources}")
+set(CMAKE_BINARY_DIR "${CMAKE_SOURCE_DIR}/bin")
+message("${CMAKE_BINARY_DIR}")
 add_library(${PROJECT_NAME}-static STATIC ${sources})
 set_target_properties( ${PROJECT_NAME}-static PROPERTIES
     VERSION "${PROJECT_VERSION}"
@@ -15,8 +18,8 @@ set_target_properties( ${PROJECT_NAME}-static PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
     LINKER_LANGUAGE CXX
 )
-target_link_libraries(${PROJECT_NAME}-static PUBLIC ${${PROJECT_NAME}_LIBRARIES_STATIC})
-target_link_libraries(${PROJECT_NAME}-static PUBLIC pthread)
+# target_link_libraries(${PROJECT_NAME}-static PUBLIC ${${PROJECT_NAME}_LIBRARIES_STATIC})
+target_link_libraries(${PROJECT_NAME}-static PUBLIC pthread autodiff::autodiff)
 
 add_library(${PROJECT_NAME}-shared SHARED ${sources})
 set_target_properties( ${PROJECT_NAME}-shared PROPERTIES
@@ -27,20 +30,20 @@ set_target_properties( ${PROJECT_NAME}-shared PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
     LINKER_LANGUAGE CXX
 )
-target_link_libraries(${PROJECT_NAME}-shared PUBLIC ${${PROJECT_NAME}_LIBRARIES_DYNAMIC})
-target_link_libraries(${PROJECT_NAME}-shared PUBLIC pthread)
+# target_link_libraries(${PROJECT_NAME}-shared PUBLIC ${${PROJECT_NAME}_LIBRARIES_DYNAMIC})
+target_link_libraries(${PROJECT_NAME}-shared PUBLIC pthread autodiff::autodiff)
 
 ########################################################################################
 #cotire(${PROJECT_NAME}-shared)
 #cotire(${PROJECT_NAME}-static)
 
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} DESTINATION include FILES_MATCHING PATTERN "*.h")
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} DESTINATION include FILES_MATCHING PATTERN "*.cpp")
-install(TARGETS ${PROJECT_NAME}-static
-        EXPORT ${PROJECT_NAME}
-        LIBRARY DESTINATION ${LIB_INSTALL_DIR}
-        ARCHIVE DESTINATION ${LIB_INSTALL_DIR}/static)
-install(TARGETS ${PROJECT_NAME}-shared
-        EXPORT ${PROJECT_NAME}
-        LIBRARY DESTINATION ${LIB_INSTALL_DIR}
-        ARCHIVE DESTINATION ${LIB_INSTALL_DIR}/static)
+# install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} DESTINATION include FILES_MATCHING PATTERN "*.h")
+# install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} DESTINATION include FILES_MATCHING PATTERN "*.cpp")
+# install(TARGETS ${PROJECT_NAME}-static
+#         EXPORT ${PROJECT_NAME}
+#         LIBRARY DESTINATION ${LIB_INSTALL_DIR}
+#         ARCHIVE DESTINATION ${LIB_INSTALL_DIR}/static)
+# install(TARGETS ${PROJECT_NAME}-shared
+#         EXPORT ${PROJECT_NAME}
+#         LIBRARY DESTINATION ${LIB_INSTALL_DIR}
+#         ARCHIVE DESTINATION ${LIB_INSTALL_DIR}/static)

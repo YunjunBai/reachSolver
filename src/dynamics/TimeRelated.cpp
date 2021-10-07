@@ -22,15 +22,15 @@ template class TimeInt<double>;
 
 template <typename Number>
 TimePoint<Number>::TimePoint()
-    :set_(new std::vector<std::vector<ReachableSetElement<Number>>>()),
-    time_(new std::vector<double>()){
+    :set_(std::vector<std::vector<ReachableSetElement<Number>>>()),
+    time_(std::vector<double>()){
 
 }
 
 template <typename Number>
 TimePoint<Number>::TimePoint(int size)
-    :set_(new std::vector<std::vector<ReachableSetElement<Number>>>(size)),
-    time_(new std::vector<double>(size)){
+    :set_(std::vector<std::vector<ReachableSetElement<Number>>>(size)),
+    time_(std::vector<double>(size)){
         
 }
 
@@ -63,15 +63,15 @@ void TimePoint<Number>::set_time(int i, double time){
 
 template <typename Number>
 TimeInt<Number>::TimeInt()
-    :set_(new std::vector<std::vector<ReachableSetElement<Number>>>()),
-    time_(new std::vector<Interval>()){
+    :set_(std::vector<std::vector<ReachableSetElement<Number>>>()),
+    time_(std::vector<Interval>()){
 
 }
 
 template <typename Number>
 TimeInt<Number>::TimeInt(int size)
-    :set_(new std::vector<std::vector<ReachableSetElement<Number>>>(size)),
-    time_(new std::vector<Interval>(size)){
+    :set_(std::vector<std::vector<ReachableSetElement<Number>>>(size)),
+    time_(std::vector<Interval>(size)){
         
 }
 

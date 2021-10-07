@@ -234,7 +234,7 @@ class Zonotope : private BasicObject {
      * @param vector 
      * @return the sum
      */
-    Zonotope Plus(const Vector_t<Number>& vector) const;
+    // Zonotope Plus(const Vector_t<Number>& vector) const;
 
     /**
      * @brief Get the minkowski addition of two zonotope,i.e., "+" operator
