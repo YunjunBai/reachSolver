@@ -116,6 +116,71 @@ ReachOptions<Number> NonlinearSys<Number>::checkOptionsReach(ReachOptions<Number
     
 // }
 
+// typedef Vector_t<double> (*mFile_type)(Vector_t<double> vector1, Vector_t<double> vector2);
+// typedef double (**mFile_f_type)(Vector_t<double> vector1, Vector_t<double> vector2);
+
+template <typename Number>
+void NonlinearSys<Number>::jacobian_(Vector_t<Number> vector1, Vector_t<Number> vector2, Matrix_t<Number> matrix1, Matrix_t<Number> matrix2){
+// void jacobian(mFile_type mFile_, Vector_t<double> vector1, Vector_t<double> vector2, Matrix_t<double> matrix1, Matrix_t<double> matrix2){
+
+    autodiff::VectorXreal F;       // the output vector F = f(x, p, q) evaluated together with Jacobian below
+
+    matrix1  = autodiff::jacobian(this->mFile_, autodiff::wrt(vector1), autodiff::at(vector1, vector2), F);       // evaluate the function and the Jacobian matrix Jx = dF/dx
+    matrix2  = autodiff::jacobian(this->mFile_, autodiff::wrt(vector2), autodiff::at(vector1, vector2), F);       // evaluate the function and the Jacobian matrix Jx = dF/du
+
+    // std::cout << "F = \n" << F << std::endl;     // print the evaluated output vector F
+    // std::cout << "Jx = \n" << Jx << std::endl;   // print the evaluated Jacobian matrix dF/dx
+    // std::cout << "Jp = \n" << Jp << std::endl;   // print the evaluated Jacobian matrix dF/dp
+    // std::cout << "Jq = \n" << Jq << std::endl;   // print the evaluated Jacobian matrix dF/dq
+    // std::cout << "Jqpx = \n" << Jqpx << std::endl; // print the evaluated Jacobian matrix [dF/dq, dF/dp, dF/dx]
+}
+
+template <typename Number>
+std::vector<IntervalMatrix> NonlinearSys<Number>::hessian_(IntervalMatrix im1, IntervalMatrix im2){
+// std::vector<IntervalMatrix> hessian(mFile_f_type mFile_f_, IntervalMatrix im1, IntervalMatrix im2){
+    typedef autodiff::dual2nd (*func_p)(autodiff::ArrayXdual2nd& vector1, autodiff::ArrayXdual2nd& vector2);
+    func_p mFile_f[6];
+    for(int i=0; i<6; i++){
+        mFile_f[i] = (func_p)this->mFile_f_[i];
+    }
+    // using Eigen::MatrixXd;
+    // using Eigen::VectorXd;
+
+    // Seprate inf and sup
+    Matrix_t<double>im1_inf = im1.inf;
+    Matrix_t<double>im1_sup = im1.sup;
+    Matrix_t<double>im2_inf = im2.inf;
+    Matrix_t<double>im2_sup = im2.sup;
+
+    autodiff::ArrayXdual2nd tmp_im1_inf, tmp_im1_sup, tmp_im2_inf, tmp_im2_sup;
+    tmp_im1_inf = autodiff::ArrayXdual2nd(im1_inf.rows());
+    tmp_im1_sup = autodiff::ArrayXdual2nd(im1_sup.rows());
+    tmp_im2_inf = autodiff::ArrayXdual2nd(im2_inf.rows());
+    tmp_im2_sup = autodiff::ArrayXdual2nd(im2_sup.rows());
+    for(int i=0; i<im1_inf.rows(); i++){
+        tmp_im1_inf[i] = im1_inf(i, 0);
+        tmp_im1_sup[i] = im1_sup(i, 0);
+    }
+    for(int i=0; i<im2_inf.rows(); i++){
+        tmp_im2_inf[i] = im2_inf(i, 0);
+        tmp_im2_sup[i] = im2_sup(i, 0);
+    }
+
+    // MatrixXd Jdyn_comb_inf = jacobian(this->mfile_, wrt(im1_inf, im2_inf), at(im1_inf, im2_inf), F);
+    // MatrixXd Jdyn_comb_sup = jacobian(this->mfile_, wrt(im1_sup, im2_sup), at(im1_sup, im2_sup), F);
+    // assert(Jdyn_comb_inf.rows() == Jdyn_comb_sup.rows());
+    std::vector<IntervalMatrix> result = std::vector<IntervalMatrix>(im1_inf.rows());
+    IntervalMatrix tmp_result;
+    autodiff::dual2nd u; // the output scalar u = f(x) evaluated together with Hessian below
+    autodiff::VectorXdual g; // gradient of f(x) evaluated together with Hessian below
+    for(int k = 0; k<im1_inf.rows(); k++){
+        tmp_result.inf = autodiff::hessian(mFile_f[k], autodiff::wrt(tmp_im1_inf, tmp_im2_inf), autodiff::at(tmp_im1_inf, tmp_im2_inf), u, g); 
+        tmp_result.sup = autodiff::hessian(mFile_f[k], autodiff::wrt(tmp_im1_sup, tmp_im2_sup), autodiff::at(tmp_im1_sup, tmp_im2_sup), u, g); 
+        result[k] = tmp_result;
+    }
+    return result;
+
+}
 
 // template <typename Number>
 // int NonlinearSys<Number>::reach(ReachOptions<Number>& options, ReachSpecification& spec, ReachableSet<Number> & R){
@@ -387,7 +452,7 @@ LinearSys<Number> NonlinearSys<Number>::linearize(ReachOptions<Number>& options,
     // substitute p into the Jacobian with respect to x and u to obtain the system matrix A and the input matrix B
     Matrix_t<Number> A = Matrix_t<Number>();
     Matrix_t<Number> B = Matrix_t<Number>();
-    jacobian(this->mFile_ ,p.x, tmp_vector2, A, B);
+    jacobian_(p.x, tmp_vector2, A, B);
     Matrix_t<Number> A_lin = A;
     Matrix_t<Number> B_lin = B;
     linOptions = options;
@@ -551,7 +616,7 @@ Vector_t<Number> NonlinearSys<Number>::abstrerr_lin(ReachOptions<Number>& option
         //     if(name_ == "nonlinParamSys"){
 
         //     }else{
-                H = hessian(this->mFile_f_, totalInt_x, totalInt_u);
+                H = hessian_(totalInt_x, totalInt_u);
         //     }
         // }
 

@@ -13,7 +13,11 @@
 
 #include "ContDynamics.h"
 #include "LinearSys.h"
-#include "derivatives.h"
+#include <autodiff/forward/real.hpp>
+#include <autodiff/forward/real/eigen.hpp>
+#include <autodiff/forward/dual.hpp>
+#include <autodiff/forward/dual/eigen.hpp>
+// #include "derivatives.h"
 namespace reachSolver{
 
 
@@ -31,8 +35,8 @@ class NonlinearSys : private ContDynamics<Number>{
     Vector_t<Number> (*mFile_)(Vector_t<Number> vector1, Vector_t<Number> vector2);
     // autodiff::dual2nd (*mFile_f[6])(autodiff::ArrayXdual2nd& vector1, autodiff::ArrayXdual2nd& vector2);
     Number (*mFile_f_[6])(Vector_t<Number> vector1, Vector_t<Number> vector2);
-    // void jacobian_(Vector_t<Number> vector1, Vector_t<Number> vector2, Matrix_t<Number> matrix1, Matrix_t<Number> matrix2);
-    // std::vector<IntervalMatrix> hessian_(IntervalMatrix im1, IntervalMatrix im2);
+    void jacobian_(Vector_t<Number> vector1, Vector_t<Number> vector2, Matrix_t<Number> matrix1, Matrix_t<Number> matrix2);
+    std::vector<IntervalMatrix> hessian_(IntervalMatrix im1, IntervalMatrix im2);
     function_type thirdOrderTensor_;
     function_type tensors_;
 
