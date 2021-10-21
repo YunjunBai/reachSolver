@@ -1,3 +1,6 @@
+## Before build
+    Use vscode-"Remote-Containers" or directly use .devcontainer/Dockerfile to build the dev docker.
+    Then use src/autodiff/derivative.hpp to replace /usr/local/include/autodiff/forward/utils/derivative.hpp.
 ## Build Instructions:
     mkdir -p build && cd build
     cmake ../
